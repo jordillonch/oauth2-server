@@ -1,6 +1,6 @@
 <?php
 
-namespace Akamon\OAuth2\Server\Behat;
+namespace Akamon\OAuth2\Server\Tests\Behat;
 
 use Akamon\Behat\ApiContext\Client\ClientInterface;
 use Akamon\OAuth2\Server\OAuth2Server;
