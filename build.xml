@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Akamon OAuth2 Server" default="help">
+    <target name="help" description="Help">
+        <exec command="./vendor/bin/phing -l" passthru="true" />
+    </target>
+
+    <target name="phpunit" description="Unit Tests">
+        <exec command="./vendor/bin/phpunit" passthru="true"/>
+    </target>
+
+    <target name="phpunit-coverage" description="Unit Tests with Coverage">
+        <exec command="./vendor/bin/phpunit --coverage-text" passthru="true"/>
+    </target>
+
+    <target name="behat" description="Acceptance Tests">
+        <exec command="./vendor/bin/behat --format=progress" passthru="true"/>
+    </target>
+
+    <target name="tests" description="All Tests">
+        <phingcall target="phpunit" />
+        <phingcall target="behat" />
+    </target>
+</project>
