@@ -1,0 +1,5 @@
+default:
+    paths:
+        features: features
+    context:
+        class: Akamon\OAuth2\Server\Behat\FeatureContext
