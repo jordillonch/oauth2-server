@@ -7,5 +7,5 @@ interface TokenGeneratorInterface
     /**
      * @return string
      */
-    function generate($length);
+    function generate();
 }

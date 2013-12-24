@@ -3,14 +3,15 @@
 namespace Akamon\OAuth2\Server;
 
 use Akamon\OAuth2\Server\Controller\TokenController;
-use Akamon\OAuth2\Server\Service\AccessTokenCreator\BearerAccessTokenCreator;
+use Akamon\OAuth2\Server\Service\AccessTokenCreator\AccessTokenCreator;
 use Akamon\OAuth2\Server\Service\AccessTokenCreator\PersistentAccessTokenCreator;
 use Akamon\OAuth2\Server\Service\ClientCredentialsObtainer\HttpBasicClientCredentialsObtainer;
 use Akamon\OAuth2\Server\Service\ClientObtainer\AuthenticatedClientObtainer;
 use Akamon\OAuth2\Server\Service\ContextObtainer\ContextObtainer;
+use Akamon\OAuth2\Server\Service\RandomGenerator\ArrayRandRandomGenerator;
 use Akamon\OAuth2\Server\Service\ScopeObtainer\ScopeObtainer;
 use Akamon\OAuth2\Server\Service\TokenCreator\TokenCreator;
-use Akamon\OAuth2\Server\Service\TokenGenerator\BasicTokenGenerator;
+use Akamon\OAuth2\Server\Service\TokenGenerator\BearerTokenGenerator;
 use Akamon\OAuth2\Server\Service\TokenGranter\TokenGranterByGrantType;
 use Akamon\OAuth2\Server\Service\TokenGrantTypeProcessor\PasswordTokenGrantTypeProcessor;
 use Akamon\OAuth2\Server\Service\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface;
@@ -37,7 +38,7 @@ class OAuth2ServerBuilder
         $this->userIdObtainer = $userIdObtainer;
 
         $this->scopeObtainer = new ScopeObtainer();
-        $this->tokenGenerator = new BasicTokenGenerator();
+        $this->tokenGenerator = new BearerTokenGenerator(new ArrayRandRandomGenerator());
 
         $this->clientObtainer = $this->createClientObtainer();
         $this->contextObtainer = $this->createContextObtainer();
@@ -65,7 +66,9 @@ class OAuth2ServerBuilder
 
     private function createAccessTokenCreator()
     {
-        $creator = new BearerAccessTokenCreator($this->tokenGenerator, 3600);
+        $params = ['type' => 'bearer', 'lifetime' => 3600];
+        $creator = new AccessTokenCreator($this->tokenGenerator, $params);
+
         $accessTokenRepository = $this->storage->getAccessTokenRepository();
 
         return new PersistentAccessTokenCreator($creator, $accessTokenRepository);

@@ -3,32 +3,34 @@
 namespace Akamon\OAuth2\Server\Tests\Service\AccessTokenCreator;
 
 use Akamon\OAuth2\Server\Model\Context;
-use Akamon\OAuth2\Server\Service\AccessTokenCreator\BearerAccessTokenCreator;
+use Akamon\OAuth2\Server\Service\AccessTokenCreator\AccessTokenCreator;
 use Akamon\OAuth2\Server\Model\Client\Client;
 use Mockery\MockInterface;
 use felpado as f;
 
-class BearerAccessTokenCreatorTest extends \PHPUnit_Framework_TestCase
+class AccessTokenCreatorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var MockInterface */
     private $tokenGenerator;
-    private $lifetime;
 
-    /** @var BearerAccessTokenCreator */
+    private $type = 'bearer';
+    private $lifetime = 3600;
+
+    /** @var AccessTokenCreator */
     private $creator;
 
     protected function setUp()
     {
         $this->tokenGenerator = \Mockery::mock('Akamon\OAuth2\Server\Service\TokenGenerator\TokenGeneratorInterface');
-        $this->lifetime = 3600;
 
-        $this->creator = new BearerAccessTokenCreator($this->tokenGenerator, $this->lifetime);
+        $params = ['type' => $this->type, 'lifetime' => $this->lifetime];
+        $this->creator = new AccessTokenCreator($this->tokenGenerator, $params);
     }
 
     public function testCreateShouldCreateAnAccessToken()
     {
         $token = sha1('foo');
-        $this->tokenGenerator->shouldReceive('generate')->once()->with(40)->andReturn($token);
+        $this->tokenGenerator->shouldReceive('generate')->with(40)->once()->andReturn($token);
 
         $client = new Client(['id' => 'ups', 'name' => 'pablodip']);
         $userId = 'bar';
