@@ -6,9 +6,9 @@ use Akamon\OAuth2\Server\Exception\OAuthError\InvalidClientCredentialsOAuthError
 use Akamon\OAuth2\Server\Exception\OAuthError\InvalidUserCredentialsOAuthErrorException;
 use Akamon\OAuth2\Server\Exception\OAuthError\UserCredentialsNotFoundException;
 use Akamon\OAuth2\Server\Exception\UserNotFoundException;
-use Akamon\OAuth2\Server\Service\ClientObtainer\ClientObtainerInterface;
-use Akamon\OAuth2\Server\Service\ScopeObtainer\ScopeObtainerInterface;
-use Akamon\OAuth2\Server\Service\UserIdObtainer\UserIdObtainerInterface;
+use Akamon\OAuth2\Server\Service\Client\ClientObtainer\ClientObtainerInterface;
+use Akamon\OAuth2\Server\Service\Scope\ScopeObtainer\ScopeObtainerInterface;
+use Akamon\OAuth2\Server\Service\User\UserIdObtainer\UserIdObtainerInterface;
 use Akamon\OAuth2\Server\Model\Context;
 use Symfony\Component\HttpFoundation\Request;
 

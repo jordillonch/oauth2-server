@@ -21,9 +21,9 @@ class ContextObtainerTest extends OAuth2TestCase
 
     protected function setUp()
     {
-        $this->clientObtainer = $this->mock('Akamon\OAuth2\Server\Service\ClientObtainer\ClientObtainerInterface');
-        $this->userIdObtainer = $this->mock('Akamon\OAuth2\Server\Service\UserIdObtainer\UserIdObtainerInterface');
-        $this->scopeObtainer = $this->mock('Akamon\OAuth2\Server\Service\ScopeObtainer\ScopeObtainerInterface');
+        $this->clientObtainer = $this->mock('Akamon\OAuth2\Server\Service\Client\ClientObtainer\ClientObtainerInterface');
+        $this->userIdObtainer = $this->mock('Akamon\OAuth2\Server\Service\User\UserIdObtainer\UserIdObtainerInterface');
+        $this->scopeObtainer = $this->mock('Akamon\OAuth2\Server\Service\Scope\ScopeObtainer\ScopeObtainerInterface');
 
         $this->contextObtainer = new ContextObtainer($this->clientObtainer, $this->userIdObtainer, $this->scopeObtainer);
     }

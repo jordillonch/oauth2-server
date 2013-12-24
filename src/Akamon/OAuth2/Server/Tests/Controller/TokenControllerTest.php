@@ -17,7 +17,7 @@ class TokenControllerTest extends OAuth2TestCase
 
     protected function setUp()
     {
-        $this->tokenGranter = $this->mock('Akamon\OAuth2\Server\Service\TokenGranter\TokenGranterInterface');
+        $this->tokenGranter = $this->mock('Akamon\OAuth2\Server\Service\Token\TokenGranter\TokenGranterInterface');
         $this->tokenController = new TokenController($this->tokenGranter);
     }
 

@@ -6,7 +6,7 @@ namespace Akamon\OAuth2\Server\Tests\Behat;
 use Akamon\OAuth2\Server\Exception\UserNotFoundException;
 use Akamon\OAuth2\Server\Model\Client\Client;
 use Akamon\OAuth2\Server\Model\UserCredentials;
-use Akamon\OAuth2\Server\Service\UserCredentialsChecker\CallbackUserCredentialsChecker;
+use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\CallbackUserCredentialsChecker;
 use Behat\Behat\Context\BehatContext;
 use Akamon\Behat\ApiContext\ApiContext;
 use Akamon\Behat\ApiContext\ParameterAccessor\DeepArrayParameterAccessor;
@@ -15,7 +15,7 @@ use Akamon\OAuth2\Server\Model\AccessToken\Infrastructure\DoctrineCacheAccessTok
 use Akamon\OAuth2\Server\Model\Client\Infrastructure\FileClientRepository;
 use Akamon\OAuth2\Server\Model\RefreshToken\Infrastructure\DoctrineCacheRefreshTokenRepository;
 use Akamon\OAuth2\Server\OAuth2ServerBuilder;
-use Akamon\OAuth2\Server\Service\UserIdObtainer\CallbackUserIdObtainer;
+use Akamon\OAuth2\Server\Service\User\UserIdObtainer\CallbackUserIdObtainer;
 use Akamon\OAuth2\Server\Storage;
 use Behat\Gherkin\Node\TableNode;
 use Doctrine\Common\Cache\ArrayCache;

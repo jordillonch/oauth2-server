@@ -2,7 +2,7 @@
 
 namespace Akamon\OAuth2\Server\Controller;
 
-use Akamon\OAuth2\Server\Service\TokenGranter\TokenGranterInterface;
+use Akamon\OAuth2\Server\Service\Token\TokenGranter\TokenGranterInterface;
 use Akamon\OAuth2\Server\Exception\OAuthError\OAuthErrorException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

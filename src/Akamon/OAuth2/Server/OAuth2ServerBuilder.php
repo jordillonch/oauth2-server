@@ -3,20 +3,20 @@
 namespace Akamon\OAuth2\Server;
 
 use Akamon\OAuth2\Server\Controller\TokenController;
-use Akamon\OAuth2\Server\Service\AccessTokenCreator\AccessTokenCreator;
-use Akamon\OAuth2\Server\Service\AccessTokenCreator\PersistentAccessTokenCreator;
-use Akamon\OAuth2\Server\Service\ClientCredentialsObtainer\HttpBasicClientCredentialsObtainer;
-use Akamon\OAuth2\Server\Service\ClientObtainer\AuthenticatedClientObtainer;
+use Akamon\OAuth2\Server\Service\Token\AccessTokenCreator\AccessTokenCreator;
+use Akamon\OAuth2\Server\Service\Token\AccessTokenCreator\PersistentAccessTokenCreator;
+use Akamon\OAuth2\Server\Service\Client\ClientCredentialsObtainer\HttpBasicClientCredentialsObtainer;
+use Akamon\OAuth2\Server\Service\Client\ClientObtainer\AuthenticatedClientObtainer;
 use Akamon\OAuth2\Server\Service\ContextObtainer\ContextObtainer;
-use Akamon\OAuth2\Server\Service\RandomGenerator\ArrayRandRandomGenerator;
-use Akamon\OAuth2\Server\Service\ScopeObtainer\ScopeObtainer;
-use Akamon\OAuth2\Server\Service\TokenCreator\TokenCreator;
-use Akamon\OAuth2\Server\Service\TokenGenerator\BearerTokenGenerator;
-use Akamon\OAuth2\Server\Service\TokenGranter\TokenGranterByGrantType;
-use Akamon\OAuth2\Server\Service\TokenGrantTypeProcessor\PasswordTokenGrantTypeProcessor;
-use Akamon\OAuth2\Server\Service\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface;
-use Akamon\OAuth2\Server\Service\UserCredentialsChecker\UserCredentialsCheckerInterface;
-use Akamon\OAuth2\Server\Service\UserIdObtainer\UserIdObtainerInterface;
+use Akamon\OAuth2\Server\Service\Token\RandomGenerator\ArrayRandRandomGenerator;
+use Akamon\OAuth2\Server\Service\Scope\ScopeObtainer\ScopeObtainer;
+use Akamon\OAuth2\Server\Service\Token\TokenCreator\TokenCreator;
+use Akamon\OAuth2\Server\Service\Token\TokenGenerator\BearerTokenGenerator;
+use Akamon\OAuth2\Server\Service\Token\TokenGranter\TokenGranterByGrantType;
+use Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor\PasswordTokenGrantTypeProcessor;
+use Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface;
+use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface;
+use Akamon\OAuth2\Server\Service\User\UserIdObtainer\UserIdObtainerInterface;
 
 class OAuth2ServerBuilder
 {
