@@ -20,7 +20,7 @@ class OAuth2TestCase extends \PHPUnit_Framework_TestCase
             'type' => 'bearer',
             'clientId' => mt_rand(),
             'userId' => mt_rand(),
-            'expiresAt' => time() + 3600
+            'lifetime' => 3600
         ], $params));
     }
 

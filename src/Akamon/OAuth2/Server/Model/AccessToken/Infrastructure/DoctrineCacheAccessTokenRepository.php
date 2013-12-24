@@ -18,12 +18,18 @@ class DoctrineCacheAccessTokenRepository implements AccessTokenRepositoryInterfa
 
     public function add(AccessToken $accessToken)
     {
-        $this->cache->save(f\get($accessToken, 'token'), $accessToken->getParams(), $accessToken->getLifetime());
+        $key = f\get($accessToken, 'token');
+        $value = $accessToken->getParams();
+        $lifetime = f\get($accessToken, 'lifetime');
+
+        $this->cache->save($key, $value, $lifetime);
     }
 
     public function remove(AccessToken $accessToken)
     {
-        $this->cache->delete(f\get($accessToken, 'token'));
+        $key = f\get($accessToken, 'token');
+
+        $this->cache->delete($key);
     }
 
     public function find($token)

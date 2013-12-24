@@ -45,7 +45,8 @@ class AccessTokenCreatorTest extends \PHPUnit_Framework_TestCase
             'type' => 'bearer',
             'clientId' => f\get($client, 'id'),
             'userId' => $userId,
-            'expiresAt' => time() + $this->lifetime,
+            'createdAt' => time(),
+            'lifetime' => $this->lifetime,
             'scope' => $scope
         ), $accessToken->getParams());
     }

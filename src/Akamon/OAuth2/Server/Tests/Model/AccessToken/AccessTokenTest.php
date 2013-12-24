@@ -13,7 +13,7 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase
             'type' => 'bearer',
             'clientId' => '123',
             'userId' => 'bar',
-            'expiresAt' => '456'
+            'lifetime' => 60
         ]);
 
         $this->assertSame([
@@ -21,7 +21,8 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase
             'type' => 'bearer',
             'clientId' => '123',
             'userId' => 'bar',
-            'expiresAt' => '456',
+            'createdAt' => time(),
+            'lifetime' => 60,
             'scope' => null
         ], $accessToken->getParams());
     }
@@ -33,7 +34,8 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase
             'type' => 'mac',
             'clientId' => '123',
             'userId' => 'bar',
-            'expiresAt' => '456',
+            'createdAt' => 2,
+            'lifetime' => 3600,
             'scope' => 'bar,ups'
         ]);
 
@@ -42,73 +44,79 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase
             'type' => 'mac',
             'clientId' => '123',
             'userId' => 'bar',
-            'expiresAt' => '456',
+            'createdAt' => 2,
+            'lifetime' => 3600,
             'scope' => 'bar,ups'
         ], $accessToken->getParams());
     }
 
-    public function testIsExpiredShouldReturnTrueWhenExpiredAtIsLessThanTime()
+    public function testGetExpiresAtReturnsCreatedAtPlusLifetime()
     {
         $accessToken = new \Akamon\OAuth2\Server\Model\AccessToken\AccessToken([
             'clientId' => '123',
             'userId' => 'bar',
             'type' => 'bearer',
             'token' => 'foo',
-            'expiresAt' => time() - 1
+            'createdAt' => 3,
+            'lifetime' => 200
+        ]);
+
+        $this->assertSame(203, $accessToken->expiresAt());
+    }
+
+    public function testIsExpiredShouldReturnTrueWhenTimeIsLessThanExpiresAt()
+    {
+        $accessToken = new \Akamon\OAuth2\Server\Model\AccessToken\AccessToken([
+            'clientId' => '123',
+            'userId' => 'bar',
+            'type' => 'bearer',
+            'token' => 'foo',
+            'createdAt' => time() - 60,
+            'lifetime' => 59
         ]);
 
         $this->assertTrue($accessToken->isExpired());
     }
 
-    public function testIsExpiredShouldReturnTrueWhenExpiredAtIsEqualToTime()
+    public function testIsExpiredShouldReturnTrueWhenTimeIsEqualToExpiresAt()
     {
         $accessToken = new \Akamon\OAuth2\Server\Model\AccessToken\AccessToken([
             'clientId' => '123',
             'userId' => 'bar',
             'type' => 'bearer',
             'token' => 'foo',
-            'expiresAt' => time()
+            'createdAt' => time() - 3600,
+            'lifetime' => 3600
         ]);
 
         $this->assertTrue($accessToken->isExpired());
     }
 
-    public function testIsExpiredShouldReturnTrueWhenExpiredAtIsGreatherThanTime()
+    public function testIsExpiredShouldReturnFalseWhenTimeIsGreaterThanExpiresAt()
     {
         $accessToken = new \Akamon\OAuth2\Server\Model\AccessToken\AccessToken([
             'clientId' => '123',
             'userId' => 'bar',
             'type' => 'bearer',
             'token' => 'foo',
-            'expiresAt' => time() + 1
+            'createdAt' => time() - 60,
+            'lifetime' => 61
         ]);
 
         $this->assertFalse($accessToken->isExpired());
     }
 
-    public function testGetLifetimeShouldReturnTheExpiredAtMinusTime()
+    public function testGetLifetimeFromNowShouldReturnExpiresAtLessTime()
     {
-        $accessToken = new AccessToken([
+        $accessToken = new \Akamon\OAuth2\Server\Model\AccessToken\AccessToken([
             'clientId' => '123',
             'userId' => 'bar',
             'type' => 'bearer',
             'token' => 'foo',
-            'expiresAt' => time() + 60
+            'createdAt' => time(),
+            'lifetime' => 60
         ]);
 
-        $this->assertSame(60, $accessToken->getLifetime());
-    }
-
-    public function testGetLifetimeShouldReturn0WhenTheLifetimeIsNegative()
-    {
-        $accessToken = new AccessToken([
-            'clientId' => '123',
-            'userId' => 'bar',
-            'type' => 'bearer',
-            'token' => 'foo',
-            'expiresAt' => time() - 1
-        ]);
-
-        $this->assertSame(0, $accessToken->getLifetime());
+        $this->assertSame($accessToken->expiresAt() - time(), $accessToken->lifetimeFromNow());
     }
 }

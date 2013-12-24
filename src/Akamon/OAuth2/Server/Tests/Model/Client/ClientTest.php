@@ -20,8 +20,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client = new \Akamon\OAuth2\Server\Model\Client\Client(['name' => $name]);
 
         $this->assertSame([
-            'name' => 'pablodip',
             'id' => null,
+            'name' => 'pablodip',
             'secret' => null,
             'allowedGrantTypes' => array(),
             'allowedScopes' => array(),

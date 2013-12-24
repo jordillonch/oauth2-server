@@ -33,7 +33,7 @@ class AccessTokenCreator implements AccessTokenCreatorInterface
             'type' => 'bearer',
             'clientId' => f\get($context->getClient(), 'id'),
             'userId' => $context->getUserId(),
-            'expiresAt' => time() + $this->lifetime,
+            'lifetime' => $this->lifetime,
             'scope' => $context->getScope()
         ]);
     }

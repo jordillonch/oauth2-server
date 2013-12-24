@@ -22,7 +22,7 @@ class TokenCreator implements TokenCreatorInterface
         return [
             'access_token' => f\get($accessToken, 'token'),
             'token_type' => f\get($accessToken, 'type'),
-            'expires_in' => f\get($accessToken, 'expiresAt') - time()
+            'expires_in' => f\get($accessToken, 'lifetime')
         ];
     }
 }

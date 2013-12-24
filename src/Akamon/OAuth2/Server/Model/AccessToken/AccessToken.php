@@ -20,7 +20,8 @@ class AccessToken implements \IteratorAggregate
             'type' => f\required(['v' => 'is_string']),
             'clientId' => f\required(['v' => 'is_scalar']),
             'userId' => f\required(['v' => 'is_scalar']),
-            'expiresAt' => f\required(['v' => 'is_numeric']),
+            'createdAt' => f\optional(['v' => 'is_int', 'd' => time()]),
+            'lifetime' => f\required(['v' => 'is_int']),
             'scope' => f\optional(['v' => 'is_string'])
         ];
     }
@@ -35,13 +36,18 @@ class AccessToken implements \IteratorAggregate
         return new \ArrayIterator($this->getParams());
     }
 
-    public function isExpired()
+    public function expiresAt()
     {
-        return f\get($this, 'expiresAt') <= time();
+        return f\get($this, 'createdAt') + f\get($this, 'lifetime');
     }
 
-    public function getLifetime()
+    public function isExpired()
     {
-        return max(f\get($this, 'expiresAt') - time(), 0);
+        return $this->expiresAt() <= time();
+    }
+
+    public function lifetimeFromNow()
+    {
+        return $this->expiresAt() - time();
     }
 }

@@ -26,7 +26,12 @@ class DoctrineCacheAccessTokenRepositoryTest extends AccessTokenRepositoryTestCa
     public function testAdd()
     {
         $accessToken = $this->createAccessToken();
-        $this->cache->shouldReceive('save')->once()->with(f\get($accessToken, 'token'), $accessToken->getParams(), $accessToken->getLifetime());
+
+        $key = f\get($accessToken, 'token');
+        $value = $accessToken->getParams();
+        $lifetime = $accessToken->lifetimeFromNow();
+
+        $this->cache->shouldReceive('save')->once()->with($key, $value, $lifetime);
 
         $this->repository->add($accessToken);
     }
@@ -34,7 +39,9 @@ class DoctrineCacheAccessTokenRepositoryTest extends AccessTokenRepositoryTestCa
     public function testRemove()
     {
         $accessToken = $this->createAccessToken();
-        $this->cache->shouldReceive('delete')->once()->with(f\get($accessToken, 'token'));
+
+        $key = f\get($accessToken, 'token');
+        $this->cache->shouldReceive('delete')->once()->with($key);
 
         $this->repository->remove($accessToken);
     }
@@ -42,7 +49,10 @@ class DoctrineCacheAccessTokenRepositoryTest extends AccessTokenRepositoryTestCa
     public function testFind()
     {
         $accessToken = $this->createAccessToken();
-        $this->cache->shouldReceive('fetch')->once()->with(f\get($accessToken, 'token'))->andReturn($accessToken->getParams());
+
+        $key = f\get($accessToken, 'token');
+        $value = $accessToken->getParams();
+        $this->cache->shouldReceive('fetch')->once()->with($key)->andReturn($value);
 
         $this->assertEquals($accessToken, $this->repository->find(f\get($accessToken, 'token')));
     }
