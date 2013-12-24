@@ -5,6 +5,7 @@ namespace Akamon\OAuth2\Server\Tests\Service\RefreshTokenCreator;
 use Akamon\OAuth2\Server\Service\RefreshTokenCreator\PersistentRefreshTokenCreator;
 use Akamon\OAuth2\Server\Tests\OAuth2TestCase;
 use Mockery\MockInterface;
+use felpado as f;
 
 class PersistentRefreshTokenCreatorTest extends OAuth2TestCase
 {
@@ -29,9 +30,25 @@ class PersistentRefreshTokenCreatorTest extends OAuth2TestCase
         $accessToken = $this->createAccessToken();
         $refreshToken = $this->createRefreshToken();
 
-        $this->delegate->shouldReceive('create')->once()->with($accessToken)->andReturn($refreshToken);
-        $this->repository->shouldReceive('add')->once()->with($refreshToken);
+        $this->delegate->shouldReceive('create')->with($accessToken)->once()->andReturn($refreshToken)->globally()->ordered();
+        $this->repository->shouldReceive('find')->with(f\get($refreshToken, 'token'))->once()->andReturnNull()->globally()->ordered();
+        $this->repository->shouldReceive('add')->with($refreshToken)->once()->globally()->ordered();
 
         $this->assertSame($refreshToken, $this->creator->create($accessToken));
+    }
+
+    public function testShouldCheckUniqueness()
+    {
+        $accessToken = $this->createAccessToken();
+        $refreshToken1 = $this->createRefreshToken();
+        $refreshToken2 = $this->createRefreshToken();
+
+        $this->delegate->shouldReceive('create')->with($accessToken)->once()->andReturn($refreshToken1)->globally()->ordered();
+        $this->repository->shouldReceive('find')->with(f\get($refreshToken1, 'token'))->once()->andReturn($refreshToken1)->globally()->ordered();
+        $this->delegate->shouldReceive('create')->with($accessToken)->once()->andReturn($refreshToken2)->globally()->ordered();
+        $this->repository->shouldReceive('find')->with(f\get($refreshToken2, 'token'))->once()->andReturnNull()->globally()->ordered();
+        $this->repository->shouldReceive('add')->once()->with($refreshToken2)->globally()->ordered();
+
+        $this->assertSame($refreshToken2, $this->creator->create($accessToken));
     }
 }

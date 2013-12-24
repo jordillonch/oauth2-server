@@ -5,6 +5,7 @@ namespace Akamon\OAuth2\Server\Tests\Service\AccessTokenCreator;
 use Akamon\OAuth2\Server\Service\AccessTokenCreator\PersistentAccessTokenCreator;
 use Akamon\OAuth2\Server\Tests\OAuth2TestCase;
 use Mockery\MockInterface;
+use felpado as f;
 
 class PersistentAccessTokenCreatorTest extends OAuth2TestCase
 {
@@ -29,9 +30,25 @@ class PersistentAccessTokenCreatorTest extends OAuth2TestCase
         $context = $this->createContextMock();
         $accessToken = $this->createAccessToken();
 
-        $this->creator->shouldReceive('create')->once()->with($context)->andReturn($accessToken);
-        $this->repository->shouldReceive('add')->once()->with($accessToken);
+        $this->creator->shouldReceive('create')->with($context)->once()->andReturn($accessToken)->globally()->ordered();
+        $this->repository->shouldReceive('find')->with(f\get($accessToken, 'token'))->once()->andReturnNull()->globally()->ordered();
+        $this->repository->shouldReceive('add')->with($accessToken)->once()->globally()->ordered();
 
         $this->assertSame($accessToken, $this->persistentCreator->create($context));
+    }
+
+    public function testCreateShouldCheckUniqueness()
+    {
+        $context = $this->createContextMock();
+        $accessToken1 = $this->createAccessToken();
+        $accessToken2 = $this->createAccessToken();
+
+        $this->creator->shouldReceive('create')->with($context)->once()->andReturn($accessToken1)->globally()->ordered();
+        $this->repository->shouldReceive('find')->with(f\get($accessToken1, 'token'))->once()->andReturn($accessToken1)->globally()->ordered();
+        $this->creator->shouldReceive('create')->with($context)->once()->andReturn($accessToken2)->globally()->ordered();
+        $this->repository->shouldReceive('find')->with(f\get($accessToken2, 'token'))->once()->andReturnNull()->globally()->ordered();
+        $this->repository->shouldReceive('add')->with($accessToken2)->once();
+
+        $this->assertSame($accessToken2, $this->persistentCreator->create($context));
     }
 }
