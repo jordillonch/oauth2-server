@@ -29,7 +29,7 @@ class AccessTokenCreator implements AccessTokenCreatorInterface
     public function create(Context $context)
     {
         return new AccessToken([
-            'token' => $this->tokenGenerator->generate(40),
+            'token' => $this->tokenGenerator->generate(),
             'type' => 'bearer',
             'clientId' => f\get($context->getClient(), 'id'),
             'userId' => $context->getUserId(),

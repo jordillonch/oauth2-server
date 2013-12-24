@@ -11,7 +11,7 @@ class RefreshTokenCreatorTest extends OAuth2TestCase
 {
     /** @var MockInterface */
     private $tokenGenerator;
-    private $lifetime;
+    private $lifetime = 60;
 
     /** @var RefreshTokenCreator */
     private $creator;
@@ -19,9 +19,9 @@ class RefreshTokenCreatorTest extends OAuth2TestCase
     protected function setUp()
     {
         $this->tokenGenerator = $this->mock('Akamon\OAuth2\Server\Service\Token\TokenGenerator\TokenGeneratorInterface');
-        $this->lifetime = 60;
 
-        $this->creator = new RefreshTokenCreator($this->tokenGenerator, $this->lifetime);
+        $params = ['lifetime' => $this->lifetime];
+        $this->creator = new RefreshTokenCreator($this->tokenGenerator, $params);
     }
 
     public function testCreate()
@@ -29,7 +29,7 @@ class RefreshTokenCreatorTest extends OAuth2TestCase
         $accessToken = $this->createAccessToken();
         $token = '123';
 
-        $this->tokenGenerator->shouldReceive('generate')->once()->with(40)->andReturn($token);
+        $this->tokenGenerator->shouldReceive('generate')->once()->andReturn($token);
 
         $refreshToken = $this->creator->create($accessToken);
 

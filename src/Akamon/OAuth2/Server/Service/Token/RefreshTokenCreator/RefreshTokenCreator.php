@@ -12,10 +12,12 @@ class RefreshTokenCreator implements RefreshTokenCreatorInterface
     private $tokenGenerator;
     private $lifetime;
 
-    public function __construct(TokenGeneratorInterface $tokenGenerator, $lifetime)
+    public function __construct(TokenGeneratorInterface $tokenGenerator, $params)
     {
         $this->tokenGenerator = $tokenGenerator;
-        $this->lifetime = $lifetime;
+
+        f\validate_collection($params, ['lifetime' => f\required(['v' => 'is_int'])]);
+        $this->lifetime = $params['lifetime'];
     }
 
     /**
@@ -24,7 +26,7 @@ class RefreshTokenCreator implements RefreshTokenCreatorInterface
     public function create(AccessToken $accessToken)
     {
         return new RefreshToken([
-            'token' => $this->tokenGenerator->generate(40),
+            'token' => $this->tokenGenerator->generate(),
             'accessTokenToken' => f\get($accessToken, 'token'),
             'expiresAt' => time() + $this->lifetime
         ]);

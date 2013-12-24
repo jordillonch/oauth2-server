@@ -30,7 +30,7 @@ class AccessTokenCreatorTest extends \PHPUnit_Framework_TestCase
     public function testCreateShouldCreateAnAccessToken()
     {
         $token = sha1('foo');
-        $this->tokenGenerator->shouldReceive('generate')->with(40)->once()->andReturn($token);
+        $this->tokenGenerator->shouldReceive('generate')->once()->andReturn($token);
 
         $client = new Client(['id' => 'ups', 'name' => 'pablodip']);
         $userId = 'bar';
