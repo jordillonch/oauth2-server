@@ -4,6 +4,7 @@ namespace Akamon\OAuth2\Server\Tests\Behat;
 
 
 use Akamon\OAuth2\Server\Exception\UserNotFoundException;
+use Akamon\OAuth2\Server\Model\AccessToken\AccessToken;
 use Akamon\OAuth2\Server\Model\Client\Client;
 use Akamon\OAuth2\Server\Model\UserCredentials;
 use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\CallbackUserCredentialsChecker;
@@ -20,14 +21,19 @@ use Akamon\OAuth2\Server\Storage;
 use Behat\Gherkin\Node\TableNode;
 use Doctrine\Common\Cache\ArrayCache;
 use Akamon\OAuth2\Server\Model\Client\ClientRepositoryInterface;
+use Akamon\OAuth2\Server\Model\AccessToken\AccessTokenRepositoryInterface;
 use Akamon\OAuth2\Server\OAuth2Server;
 use felpado as f;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class FeatureContext extends BehatContext
 {
     private $users;
     /** @var ClientRepositoryInterface */
     private $clientRepository;
+    /** @var AccessTokenRepositoryInterface */
+    private $accessTokenRepository;
     /** @var OAuth2Server */
     private $server;
 
@@ -47,15 +53,25 @@ class FeatureContext extends BehatContext
         $this->users = new \ArrayObject();
         $this->clientRepository = new FileClientRepository(tempnam(sys_get_temp_dir(), 'akamon-oauth2-server-clients'));
 
-        $accessTokenRepository = new DoctrineCacheAccessTokenRepository(new ArrayCache());
+        $this->accessTokenRepository = new DoctrineCacheAccessTokenRepository(new ArrayCache());
         $refreshTokenRepository = new DoctrineCacheRefreshTokenRepository(new ArrayCache());
 
-        $storage = new Storage($this->clientRepository, $accessTokenRepository, $refreshTokenRepository);
+        $storage = new Storage($this->clientRepository, $this->accessTokenRepository, $refreshTokenRepository);
+        $resourceProcessor = [$this, 'resourceProcessor'];
 
-        $builder = new OAuth2ServerBuilder($storage);
+        $builder = new OAuth2ServerBuilder($storage, $resourceProcessor);
         $builder->addResourceOwnerPasswordCredentialsGrant($this->createUserCredentialsChecker($this->users), $this->createUserIdObtainer($this->users));
 
         $this->server = $builder->build();
+    }
+
+    public function resourceProcessor(Request $request, AccessToken $accessToken)
+    {
+        $response = new Response();
+        $response->headers->set('content-type', 'text/plain');
+        $response->setContent('My resource!');
+
+        return $response;
     }
 
     private function createUserIdObtainer($users)
@@ -176,6 +192,41 @@ class FeatureContext extends BehatContext
     }
 
     /**
+     * @Given /^I have an expired access token "([^"]*)"$/
+     */
+    public function iHaveAnExpiredAccessToken($token)
+    {
+        $accessToken = $this->createAccessToken([
+            'token' => $token,
+            'createdAt' => time() - 60,
+            'lifetime' => 59
+        ]);
+
+        $this->accessTokenRepository->add($accessToken);
+    }
+
+    /**
+     * @Given /^I have a valid access token "([^"]*)"$/
+     */
+    public function iHaveAValidAccessToken($token)
+    {
+        $accessToken = $this->createAccessToken(['token' => $token]);
+
+        $this->accessTokenRepository->add($accessToken);
+    }
+
+    private function createAccessToken(array $params = array())
+    {
+        return new AccessToken(array_replace([
+            'token' => sha1(microtime().mt_rand()),
+            'type' => 'bearer',
+            'clientId' => mt_rand(),
+            'userId' => mt_rand(),
+            'lifetime' => 3600
+        ], $params));
+    }
+
+    /**
      * @When /^I add the http basic authentication header with "([^"]*)" and "([^"]*)"$/
      */
     public function iAddTheHttpBasicAuthenticationHeaderWithAnd($username, $password)
@@ -189,6 +240,14 @@ class FeatureContext extends BehatContext
     public function iMakeAOauthTokenRequest()
     {
         $this->getApiContext()->request('POST', '/oauth/token');
+    }
+
+    /**
+     * @When /^I make a resource request$/
+     */
+    public function iMakeAResourceRequest()
+    {
+        $this->getApiContext()->request('GET', '/resource');
     }
 
     /**

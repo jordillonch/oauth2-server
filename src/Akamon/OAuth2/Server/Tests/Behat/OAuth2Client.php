@@ -20,8 +20,14 @@ class OAuth2Client implements ClientInterface
      */
     public function request(Http\Request $request)
     {
-        if ($request->getPathInfo() === '/oauth/token') {
+        $uri = $request->getPathInfo();
+
+        if ($uri === '/oauth/token') {
             return $this->server->token($request);
+        }
+
+        if ($uri === '/resource') {
+            return $this->server->resource($request);
         }
 
         throw new \Exception('Invalid request.');

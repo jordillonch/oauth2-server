@@ -5,7 +5,6 @@ namespace Akamon\OAuth2\Server\Controller;
 use Akamon\OAuth2\Server\Service\Token\TokenGranter\TokenGranterInterface;
 use Akamon\OAuth2\Server\Exception\OAuthError\OAuthErrorException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class TokenController
 {
@@ -21,20 +20,9 @@ class TokenController
         try {
             $responseParameters = $this->tokenGranter->grant($request);
         } catch (OAuthErrorException $e) {
-            return $this->createHttpResponse($e->getHttpStatusCode(), $e->getParameters(), $e->getHeaders());
+            return Controller::createOAuthHttpResponse($e->getHttpStatusCode(), $e->getParameters(), $e->getHeaders());
         }
 
-        return $this->createHttpResponse(200, $responseParameters);
-    }
-
-    private function createHttpResponse($statusCode, array $parameters, array $headers = [])
-    {
-        $content = json_encode($parameters, true);
-
-        return new Response($content, $statusCode, [
-            'content-type' => 'application/json',
-            'cache-control' => 'no-store, private',
-            'pragma' => 'no-cache'
-        ] + $headers);
+        return Controller::createOAuthHttpResponse(200, $responseParameters);
     }
 }
