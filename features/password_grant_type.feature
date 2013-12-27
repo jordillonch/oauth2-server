@@ -34,8 +34,8 @@ Feature: OAuth Token Grant Password
     And I make a token request
     Then the response status code should be "400"
     And the oauth response format and cache are right
-    And the response parameter "error" should be "invalid_grant"
-    And the response parameter "message" should be "User authentication failed."
+    And the response parameter "error" should be "invalid_request"
+    And the response parameter "message" should be "The user credentials are required."
 
   Scenario Outline: Invalid user credentials
     Given I add the http basic authentication for the client "pablodip" and "abc"

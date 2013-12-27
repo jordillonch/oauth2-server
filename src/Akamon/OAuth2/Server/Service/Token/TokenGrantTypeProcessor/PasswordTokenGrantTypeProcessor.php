@@ -4,22 +4,27 @@ namespace Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor;
 
 use Akamon\OAuth2\Server\Exception\OAuthError\InvalidUserCredentialsOAuthErrorException;
 use Akamon\OAuth2\Server\Exception\OAuthError\UserCredentialsNotFoundException;
+use Akamon\OAuth2\Server\Model\Client\Client;
+use Akamon\OAuth2\Server\Model\Context;
 use Akamon\OAuth2\Server\Model\UserCredentials;
-use Akamon\OAuth2\Server\Service\ContextObtainer\ContextObtainerInterface;
+use Akamon\OAuth2\Server\Service\Scope\ScopeObtainer\ScopeObtainerInterface;
 use Akamon\OAuth2\Server\Service\Token\TokenCreator\TokenCreatorInterface;
 use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Akamon\OAuth2\Server\Service\User\UserIdObtainer\UserIdObtainerInterface;
+use felpado as f;
 
 class PasswordTokenGrantTypeProcessor implements TokenGrantTypeProcessorInterface
 {
-    private $contextObtainer;
     private $userCredentialsChecker;
+    private $userIdObtainer;
+    private $scopeObtainer;
     private $tokenCreator;
 
-    public function __construct(ContextObtainerInterface $contextObtainer, UserCredentialsCheckerInterface $userCredentialsChecker, TokenCreatorInterface $tokenCreator)
+    public function __construct(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer, ScopeObtainerInterface $scopeObtainer, TokenCreatorInterface $tokenCreator)
     {
-        $this->contextObtainer = $contextObtainer;
         $this->userCredentialsChecker = $userCredentialsChecker;
+        $this->userIdObtainer = $userIdObtainer;
+        $this->scopeObtainer = $scopeObtainer;
         $this->tokenCreator = $tokenCreator;
     }
 
@@ -28,35 +33,36 @@ class PasswordTokenGrantTypeProcessor implements TokenGrantTypeProcessorInterfac
         return 'password';
     }
 
-    public function process(Request $request)
+    public function process(Client $client, array $inputData)
     {
-        $getUsername = function () use ($request) {
-            return $request->request->get('username');
-        };
-        $context = $this->contextObtainer->getContext($request, $getUsername);
-
-        $userCredentials = $this->getUserCredentialsFromRequest($request);
+        $userCredentials = $this->getUserCredentialsFromInputData($inputData);
         if (!$this->userCredentialsChecker->check($userCredentials)) {
             throw new InvalidUserCredentialsOAuthErrorException();
         }
 
+        $userId = $this->userIdObtainer->getUserId($userCredentials->getUsername());
+        $scope = $this->scopeObtainer->getScope($inputData);
+
+        $context = new Context($client, $userId, $scope);
+
         return $this->tokenCreator->create($context);
     }
 
-    private function getUserCredentialsFromRequest(Request $request)
+    private function getUserCredentialsFromInputData($inputData)
     {
-        if ($this->hasNoUserCredentialsInRequest($request)) {
+        if ($this->hasNoUserCredentialsInInputData($inputData)) {
             throw new UserCredentialsNotFoundException();
         }
 
-        $username = $request->request->get('username');
-        $password = $request->request->get('password');
+        $username = f\get($inputData, 'username');
+        $password = f\get($inputData, 'password');
 
         return new UserCredentials($username, $password);
     }
 
-    private function hasNoUserCredentialsInRequest(Request $request)
+    private function hasNoUserCredentialsInInputData($inputData)
     {
-        return !$request->request->has('username') || !$request->request->has('password');
+        return f\not(f\contains($inputData, 'username')) ||
+               f\not(f\contains($inputData, 'password'));
     }
 }

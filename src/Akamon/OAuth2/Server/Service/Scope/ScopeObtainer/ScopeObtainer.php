@@ -2,13 +2,12 @@
 
 namespace Akamon\OAuth2\Server\Service\Scope\ScopeObtainer;
 
-use Akamon\OAuth2\Server\Service\Scope\ScopeObtainer\ScopeObtainerInterface;
-use Symfony\Component\HttpFoundation\Request;
+use felpado as f;
 
 class ScopeObtainer implements ScopeObtainerInterface
 {
-    public function getScope(Request $request)
+    public function getScope(array $inputData)
     {
-        return $request->request->get('scope');
+        return f\get_or($inputData, 'scope', null);
     }
 }

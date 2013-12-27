@@ -2,18 +2,20 @@
 
 namespace Akamon\OAuth2\Server\Tests\Service\Token\TokenGrantTypeProcessor;
 
+use Akamon\OAuth2\Server\Model\Context;
 use Akamon\OAuth2\Server\Model\UserCredentials;
 use Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor\PasswordTokenGrantTypeProcessor;
 use Akamon\OAuth2\Server\Tests\OAuth2TestCase;
-use Symfony\Component\HttpFoundation\Request;
 use Mockery\MockInterface;
 
 class PasswordTokenGrantTypeProcessorTest extends OAuth2TestCase
 {
     /** @var MockInterface */
-    private $contextObtainer;
-    /** @var MockInterface */
     private $userCredentialsChecker;
+    /** @var MockInterface */
+    private $userIdObtainer;
+    /** @var MockInterface */
+    private $scopeObtainer;
     /** @var MockInterface */
     private $tokenCreator;
 
@@ -22,11 +24,12 @@ class PasswordTokenGrantTypeProcessorTest extends OAuth2TestCase
 
     protected function setUp()
     {
-        $this->contextObtainer = $this->mock('Akamon\OAuth2\Server\Service\ContextObtainer\ContextObtainerInterface');
         $this->userCredentialsChecker = $this->mock('Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface');
+        $this->userIdObtainer = $this->mock('Akamon\OAuth2\Server\Service\User\UserIdObtainer\UserIdObtainerInterface');
+        $this->scopeObtainer = $this->mock('Akamon\OAuth2\Server\Service\Scope\ScopeObtainer\ScopeObtainerInterface');
         $this->tokenCreator = $this->mock('Akamon\OAuth2\Server\Service\Token\TokenCreator\TokenCreatorInterface');
 
-        $this->processor = new PasswordTokenGrantTypeProcessor($this->contextObtainer, $this->userCredentialsChecker, $this->tokenCreator);
+        $this->processor = new PasswordTokenGrantTypeProcessor($this->userCredentialsChecker, $this->userIdObtainer, $this->scopeObtainer, $this->tokenCreator);
     }
 
     public function testGetGrantTypeShouldReturnPassword()
@@ -36,40 +39,43 @@ class PasswordTokenGrantTypeProcessorTest extends OAuth2TestCase
 
     public function testProcessOk()
     {
+        $client = $this->createClient();
+
+        $userId = 'foo';
         $username = 'pablodip';
         $password = 'pass';
         $userCredentials = new UserCredentials($username, $password);
 
-        $context = $this->createContextMock();
+        $scope = 'all';
 
-        $request = $this->createAuthenticatedRequest($username, $password);
-        $response = new \stdClass();
+        $context = new Context($client, $userId, $scope);
 
-        $this->contextObtainer->shouldReceive('getContext')->once()->with($request, \Mockery::any())->andReturn($context);
+        $inputData = ['username' => $username, 'password' => $password, 'scope' => $scope];
+        $parameters = new \stdClass();
+
         $this->userCredentialsChecker->shouldReceive('check')->once()->with(\Mockery::on(function ($v) use ($userCredentials) { return $v == $userCredentials; }))->andReturn(true);
-        $this->tokenCreator->shouldReceive('create')->once()->with($context)->andReturn($response);
+        $this->userIdObtainer->shouldReceive('getUserId')->once()->with($username)->andReturn($userId);
+        $this->scopeObtainer->shouldReceive('getScope')->once()->with($inputData)->andReturn($scope);
+        $this->tokenCreator->shouldReceive('create')->once()->with(\Mockery::on(function ($v) use ($context) { return $v == $context; }))->andReturn($parameters);
 
-        $this->assertSame($response, $this->processor->process($request));
+        $this->assertSame($parameters, $this->processor->process($client, $inputData));
     }
 
     /**
      * @dataProvider providerUserCredentialsNotFound
      * @expectedException \Akamon\OAuth2\Server\Exception\OAuthError\UserCredentialsNotFoundException
      */
-    public function testGrantShouldThrowAnUserCredentialsNotFoundException($request)
+    public function testGrantShouldThrowAnUserCredentialsNotFoundException($inputData)
     {
-        $context = $this->createContextMock();
-        $this->contextObtainer->shouldReceive('getContext')->once()->with($request, \Mockery::any())->andReturn($context);
-
-        $this->processor->process($request);
+        $this->processor->process($this->createClient(), $inputData);
     }
 
     public function providerUserCredentialsNotFound()
     {
         return [
-            [new Request()],
-            [new Request([], ['username' => 'foo'])],
-            [new Request([], ['password' => 'foo'])]
+            [[]],
+            [['username' => 'foo']],
+            [['password' => 'foo']]
         ];
     }
 
@@ -82,21 +88,10 @@ class PasswordTokenGrantTypeProcessorTest extends OAuth2TestCase
         $password = 'pass';
         $userCredentials = new UserCredentials($username, $password);
 
-        $context = $this->createContextMock();
+        $inputData = ['username' => $username, 'password' => $password];
 
-        $request = $this->createAuthenticatedRequest($username, $password);
-
-        $this->contextObtainer->shouldReceive('getContext')->once()->with($request, \Mockery::any())->andReturn($context);
         $this->userCredentialsChecker->shouldReceive('check')->once()->with(\Mockery::on(function ($v) use ($userCredentials) { return $v == $userCredentials; }))->andReturn(false);
 
-        $this->processor->process($request);
-    }
-
-    private function createAuthenticatedRequest($username, $password, $scope = '')
-    {
-        $query = [];
-        $request = ['username' => $username, 'password' => $password, 'scope' => $scope];
-
-        return new Request($query, $request);
+        $this->processor->process($this->createClient(), $inputData);
     }
 }

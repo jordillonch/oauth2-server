@@ -8,7 +8,6 @@ use Akamon\OAuth2\Server\Storage;
 class OAuth2ServerBuilderTest extends OAuth2TestCase
 {
     private $storage;
-    private $userIdObtainer;
 
     /** @var OAuth2ServerBuilder */
     private $builder;
@@ -16,9 +15,8 @@ class OAuth2ServerBuilderTest extends OAuth2TestCase
     protected function setUp()
     {
         $this->storage = $this->buildStorage();
-        $this->userIdObtainer = $this->mock('Akamon\OAuth2\Server\Service\User\UserIdObtainer\UserIdObtainerInterface');
 
-        $this->builder = new OAuth2ServerBuilder($this->storage, $this->userIdObtainer);
+        $this->builder = new OAuth2ServerBuilder($this->storage);
     }
 
     private function buildStorage()
@@ -40,8 +38,9 @@ class OAuth2ServerBuilderTest extends OAuth2TestCase
     public function testBuildWithResourceOwnerPasswordCredentialsGrant()
     {
         $userCredentialsChecker = $this->mock('Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface');
+        $userIdObtainer = $this->mock('Akamon\OAuth2\Server\Service\User\UserIdObtainer\UserIdObtainerInterface');
 
-        $this->builder->addResourceOwnerPasswordCredentialsGrant($userCredentialsChecker);
+        $this->builder->addResourceOwnerPasswordCredentialsGrant($userCredentialsChecker, $userIdObtainer);
 
         $server = $this->builder->build();
         $this->assertInstanceOf('Akamon\OAuth2\Server\OAuth2Server', $server);

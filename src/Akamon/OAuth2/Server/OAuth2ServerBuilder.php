@@ -7,7 +7,6 @@ use Akamon\OAuth2\Server\Service\Token\AccessTokenCreator\AccessTokenCreator;
 use Akamon\OAuth2\Server\Service\Token\AccessTokenCreator\PersistentAccessTokenCreator;
 use Akamon\OAuth2\Server\Service\Client\ClientCredentialsObtainer\HttpBasicClientCredentialsObtainer;
 use Akamon\OAuth2\Server\Service\Client\ClientObtainer\AuthenticatedClientObtainer;
-use Akamon\OAuth2\Server\Service\ContextObtainer\ContextObtainer;
 use Akamon\OAuth2\Server\Service\Token\RandomGenerator\ArrayRandRandomGenerator;
 use Akamon\OAuth2\Server\Service\Scope\ScopeObtainer\ScopeObtainer;
 use Akamon\OAuth2\Server\Service\Token\TokenCreator\TokenCreator;
@@ -21,27 +20,23 @@ use Akamon\OAuth2\Server\Service\User\UserIdObtainer\UserIdObtainerInterface;
 class OAuth2ServerBuilder
 {
     private $storage;
-    private $userIdObtainer;
 
     private $scopeObtainer;
     private $tokenGenerator;
 
     private $clientObtainer;
-    private $contextObtainer;
     private $tokenCreator;
 
     private $tokenGrantTypeProcessors = [];
 
-    public function __construct(Storage $storage, UserIdObtainerInterface $userIdObtainer)
+    public function __construct(Storage $storage)
     {
         $this->storage = $storage;
-        $this->userIdObtainer = $userIdObtainer;
 
         $this->scopeObtainer = new ScopeObtainer();
         $this->tokenGenerator = new BearerTokenGenerator(new ArrayRandRandomGenerator());
 
         $this->clientObtainer = $this->createClientObtainer();
-        $this->contextObtainer = $this->createContextObtainer();
         $this->tokenCreator = $this->createTokenCreator();
     }
 
@@ -50,11 +45,6 @@ class OAuth2ServerBuilder
         $clientCredentialsObtainer = new HttpBasicClientCredentialsObtainer();
 
         return new AuthenticatedClientObtainer($clientCredentialsObtainer, $this->storage->getClientRepository());
-    }
-
-    private function createContextObtainer()
-    {
-        return new ContextObtainer($this->clientObtainer, $this->userIdObtainer, $this->scopeObtainer);
     }
 
     private function createTokenCreator()
@@ -74,9 +64,9 @@ class OAuth2ServerBuilder
         return new PersistentAccessTokenCreator($creator, $accessTokenRepository);
     }
 
-    public function addResourceOwnerPasswordCredentialsGrant(UserCredentialsCheckerInterface $userCredentialsChecker)
+    public function addResourceOwnerPasswordCredentialsGrant(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer)
     {
-        $processor = new PasswordTokenGrantTypeProcessor($this->contextObtainer, $userCredentialsChecker, $this->tokenCreator);
+        $processor = new PasswordTokenGrantTypeProcessor($userCredentialsChecker, $userIdObtainer, $this->scopeObtainer, $this->tokenCreator);
 
         $this->addTokenGrantTypeProcessor($processor);
     }

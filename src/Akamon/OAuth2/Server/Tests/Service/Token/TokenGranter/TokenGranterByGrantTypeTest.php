@@ -41,13 +41,15 @@ class TokenGranterByGrantTypeTest extends OAuth2TestCase
 
     public function testGrantOk()
     {
+        $inputData = ['a' => 1, 'b' => 2];
         $request = $this->createRequestForGrantType('password');
+        $request->request->add($inputData);
         $response = new \stdClass();
 
         $client = $this->createClient(['allowedGrantTypes' => ['password']]);
         $this->clientObtainer->shouldReceive('getClient')->with($request)->once()->andReturn($client);
 
-        $this->processorPassword->shouldReceive('process')->once()->with($request)->andReturn($response);
+        $this->processorPassword->shouldReceive('process')->once()->with($client, $inputData)->andReturn($response);
 
         $this->assertSame($response, $this->granter->grant($request));
     }

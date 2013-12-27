@@ -51,10 +51,9 @@ class FeatureContext extends BehatContext
         $refreshTokenRepository = new DoctrineCacheRefreshTokenRepository(new ArrayCache());
 
         $storage = new Storage($this->clientRepository, $accessTokenRepository, $refreshTokenRepository);
-        $userIdObtainer = $this->createUserIdObtainer($this->users);
 
-        $builder = new OAuth2ServerBuilder($storage, $userIdObtainer);
-        $builder->addResourceOwnerPasswordCredentialsGrant($this->createUserCredentialsChecker($this->users));
+        $builder = new OAuth2ServerBuilder($storage);
+        $builder->addResourceOwnerPasswordCredentialsGrant($this->createUserCredentialsChecker($this->users), $this->createUserIdObtainer($this->users));
 
         $this->server = $builder->build();
     }

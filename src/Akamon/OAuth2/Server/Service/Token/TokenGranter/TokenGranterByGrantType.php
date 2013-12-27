@@ -3,16 +3,12 @@
 namespace Akamon\OAuth2\Server\Service\Token\TokenGranter;
 
 use Akamon\OAuth2\Server\Exception\OAuthError\GrantTypeNotFoundOAuthErrorException;
-use Akamon\OAuth2\Server\Exception\OAuthError\InvalidClientCredentialsOAuthErrorException;
 use Akamon\OAuth2\Server\Exception\OAuthError\UnauthorizedClientForGrantTypeOAuthErrorException;
 use Akamon\OAuth2\Server\Exception\OAuthError\UnsupportedGrantTypeOAuthErrorException;
-use Akamon\OAuth2\Server\Model\Client\Client;
-use Akamon\OAuth2\Server\Model\Client\ClientCredentials;
-use Akamon\OAuth2\Server\Model\Client\ClientRepositoryInterface;
-use Akamon\OAuth2\Server\Service\Client\ClientCredentialsObtainer\ClientCredentialsObtainerInterface;
 use Akamon\OAuth2\Server\Service\Client\ClientObtainer\ClientObtainerInterface;
 use Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface;
 use Symfony\Component\HttpFoundation\Request;
+use felpado as f;
 
 class TokenGranterByGrantType implements TokenGranterInterface
 {
@@ -42,7 +38,9 @@ class TokenGranterByGrantType implements TokenGranterInterface
             throw new UnauthorizedClientForGrantTypeOAuthErrorException();
         }
 
-        return $this->findProcessor($grantType)->process($request);
+        $inputData = $this->getInputDataFromRequest($request);
+
+        return $this->findProcessor($grantType)->process($client, $inputData);
     }
 
     private function getGrantTypeFromRequest(Request $request)
@@ -66,5 +64,10 @@ class TokenGranterByGrantType implements TokenGranterInterface
         }
 
         throw new UnsupportedGrantTypeOAuthErrorException();
+    }
+
+    private function getInputDataFromRequest(Request $request)
+    {
+        return f\dissoc($request->request->all(), 'grant_type');
     }
 }
