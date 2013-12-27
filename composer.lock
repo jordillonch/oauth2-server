@@ -58,12 +58,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:Akamon/behat-api-context.git",
-                "reference": "08e62040fb047d12a13dd15799818000529ee76d"
+                "reference": "02ec3739a0b4e98a874c66d5572b66f09c9ace07"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Akamon/behat-api-context/zipball/08e62040fb047d12a13dd15799818000529ee76d",
-                "reference": "08e62040fb047d12a13dd15799818000529ee76d",
+                "url": "https://api.github.com/repos/Akamon/behat-api-context/zipball/02ec3739a0b4e98a874c66d5572b66f09c9ace07",
+                "reference": "02ec3739a0b4e98a874c66d5572b66f09c9ace07",
                 "shasum": ""
             },
             "require": {
@@ -94,7 +94,7 @@
                 "source": "https://github.com/Akamon/behat-api-context/tree/master",
                 "issues": "https://github.com/Akamon/behat-api-context/issues"
             },
-            "time": "2013-12-17 09:45:07"
+            "time": "2013-12-27 12:02:31"
         },
         {
             "name": "behat/behat",
