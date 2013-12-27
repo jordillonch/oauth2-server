@@ -15,12 +15,11 @@
         "doctrine/orm": "~2.4",
         "symfony/security": "~2.4",
         "phing/phing": "~2.6",
-        "ircmaxell/random-lib": "~1.0"
+        "ircmaxell/random-lib": "~1.0",
+        "symfony/finder": "~2.4"
     },
     "autoload": {
-        "psr-0": {
-            "Akamon\\OAuth2\\Server": "src"
-        }
+        "classmap": ["src"]
     },
     "repositories": [
         {
