@@ -24,10 +24,13 @@ use Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor\RefreshTokenGrant
 use Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface;
 use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface;
 use Akamon\OAuth2\Server\Service\User\UserIdObtainer\UserIdObtainerInterface;
+use felpado as f;
 
 class OAuth2ServerBuilder
 {
     private $storage;
+
+    private $lifetime;
     private $resourceProcessor;
 
     private $scopeObtainer;
@@ -38,10 +41,16 @@ class OAuth2ServerBuilder
 
     private $tokenGrantTypeProcessors = [];
 
-    public function __construct(Storage $storage, $resourceProcessor)
+    public function __construct(Storage $storage, $params)
     {
         $this->storage = $storage;
-        $this->resourceProcessor = $resourceProcessor;
+
+        f\validate_collection_or_throw($params, [
+            'lifetime' => f\required(['v' => 'is_int']),
+            'resource_processor' => f\required(['v' => 'is_callable'])
+        ]);
+        $this->lifetime = $params['lifetime'];
+        $this->resourceProcessor = $params['resource_processor'];
 
         $this->scopeObtainer = new ScopeObtainer();
         $this->tokenGenerator = new BearerTokenGenerator(new ArrayRandRandomGenerator());
@@ -69,7 +78,7 @@ class OAuth2ServerBuilder
 
     private function createAccessTokenCreator()
     {
-        $params = ['type' => 'bearer', 'lifetime' => 3600];
+        $params = ['type' => 'bearer', 'lifetime' => $this->lifetime];
         $creator = new AccessTokenCreator($this->tokenGenerator, $params);
 
         $accessTokenRepository = $this->storage->getAccessTokenRepository();
@@ -79,7 +88,7 @@ class OAuth2ServerBuilder
 
     private function createRefreshTokenCreator()
     {
-        $params = ['lifetime' => 3600];
+        $params = ['lifetime' => $this->lifetime];
         $creator = new RefreshTokenCreator($this->tokenGenerator, $params);
 
         $repository = $this->storage->getRefreshTokenRepository();

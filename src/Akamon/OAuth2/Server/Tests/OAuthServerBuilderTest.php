@@ -15,9 +15,11 @@ class OAuth2ServerBuilderTest extends OAuth2TestCase
     protected function setUp()
     {
         $this->storage = $this->buildStorage();
+
+        $lifetime = 3600;
         $resourceProcessor = function () { };
 
-        $this->builder = new OAuth2ServerBuilder($this->storage, $resourceProcessor);
+        $this->builder = new OAuth2ServerBuilder($this->storage, ['lifetime' => $lifetime, 'resource_processor' => $resourceProcessor]);
     }
 
     private function buildStorage()
