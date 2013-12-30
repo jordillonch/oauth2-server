@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pablodip/felpado.git",
-                "reference": "0f7720b77f6546210f4b4b8cfcc8b996c1550f78"
+                "reference": "462f967a00dd6aa4d6881753e5de1c37273cc5ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pablodip/felpado/zipball/0f7720b77f6546210f4b4b8cfcc8b996c1550f78",
-                "reference": "0f7720b77f6546210f4b4b8cfcc8b996c1550f78",
+                "url": "https://api.github.com/repos/pablodip/felpado/zipball/462f967a00dd6aa4d6881753e5de1c37273cc5ab",
+                "reference": "462f967a00dd6aa4d6881753e5de1c37273cc5ab",
                 "shasum": ""
             },
             "require": {
@@ -48,7 +48,7 @@
                 "functional",
                 "programming"
             ],
-            "time": "2013-12-26 23:21:29"
+            "time": "2013-12-28 18:01:31"
         }
     ],
     "packages-dev": [
