@@ -23,11 +23,11 @@ class RefreshTokenCreator implements RefreshTokenCreatorInterface
     /**
      * @return \Akamon\OAuth2\Server\Model\RefreshToken\RefreshToken
      */
-    public function create(AccessToken $accessToken)
+    public function create($accessTokenTokenToken)
     {
         return new RefreshToken([
             'token' => $this->tokenGenerator->generate(),
-            'accessTokenToken' => f\get($accessToken, 'token'),
+            'accessTokenToken' => $accessTokenTokenToken,
             'expiresAt' => time() + $this->lifetime
         ]);
     }

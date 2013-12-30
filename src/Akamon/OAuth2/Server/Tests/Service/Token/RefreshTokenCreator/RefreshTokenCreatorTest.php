@@ -26,17 +26,17 @@ class RefreshTokenCreatorTest extends OAuth2TestCase
 
     public function testCreate()
     {
-        $accessToken = $this->createAccessToken();
+        $accessTokenToken = 'foo';
         $token = '123';
 
         $this->tokenGenerator->shouldReceive('generate')->once()->andReturn($token);
 
-        $refreshToken = $this->creator->create($accessToken);
+        $refreshToken = $this->creator->create($accessTokenToken);
 
         $this->assertInstanceOf('Akamon\OAuth2\Server\Model\RefreshToken\RefreshToken', $refreshToken);
         $this->assertSame([
             'token' => $token,
-            'accessTokenToken' => f\get($accessToken, 'token'),
+            'accessTokenToken' => 'foo',
             'expiresAt' => time() + $this->lifetime
         ], $refreshToken->getParams());
     }

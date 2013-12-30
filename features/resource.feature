@@ -16,7 +16,7 @@ Feature: OAuth Resource
     And the response parameter "message" should be "Invalid access token."
 
   Scenario: Expired access token
-    Given I have an expired access token "foo"
+    Given there is an expired access token "foo"
     Given I add the request header "authorization" with "Bearer foo"
     When I make a resource request
     Then the response status code should be "400"
@@ -25,7 +25,7 @@ Feature: OAuth Resource
     And the response parameter "message" should be "Expired access token."
 
   Scenario: Accessing to the resource
-    Given I have a valid access token "foo"
+    Given there is a valid access token "foo"
     Given I add the request header "authorization" with "Bearer foo"
     When I make a resource request
     Then the response status code should be "200"

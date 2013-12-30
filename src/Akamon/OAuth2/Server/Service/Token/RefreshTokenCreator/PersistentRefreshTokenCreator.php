@@ -2,7 +2,6 @@
 
 namespace Akamon\OAuth2\Server\Service\Token\RefreshTokenCreator;
 
-use Akamon\OAuth2\Server\Model\AccessToken\AccessToken;
 use Akamon\OAuth2\Server\Model\RefreshToken\RefreshToken;
 use Akamon\OAuth2\Server\Model\RefreshToken\RefreshTokenRepositoryInterface;
 use felpado as f;
@@ -21,20 +20,20 @@ class PersistentRefreshTokenCreator implements RefreshTokenCreatorInterface
     /**
      * @return \Akamon\OAuth2\Server\Model\RefreshToken\RefreshToken
      */
-    public function create(AccessToken $accessToken)
+    public function create($accessTokenToken)
     {
-        $refreshToken = $this->generateRefreshToken($accessToken);
+        $refreshToken = $this->generateRefreshToken($accessTokenToken);
 
         $this->repository->add($refreshToken);
 
         return $refreshToken;
     }
 
-    private function generateRefreshToken(AccessToken $accessToken)
+    private function generateRefreshToken($accessTokenToken)
     {
-        $refreshToken = $this->delegate->create($accessToken);
+        $refreshToken = $this->delegate->create($accessTokenToken);
         if ($this->refreshTokenExits($refreshToken)) {
-            return $this->generateRefreshToken($accessToken);
+            return $this->generateRefreshToken($accessTokenToken);
         }
 
         return $refreshToken;

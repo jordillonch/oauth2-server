@@ -6,6 +6,7 @@ namespace Akamon\OAuth2\Server\Tests\Behat;
 use Akamon\OAuth2\Server\Exception\UserNotFoundException;
 use Akamon\OAuth2\Server\Model\AccessToken\AccessToken;
 use Akamon\OAuth2\Server\Model\Client\Client;
+use Akamon\OAuth2\Server\Model\RefreshToken\RefreshToken;
 use Akamon\OAuth2\Server\Model\UserCredentials;
 use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\CallbackUserCredentialsChecker;
 use Behat\Behat\Context\BehatContext;
@@ -22,6 +23,7 @@ use Behat\Gherkin\Node\TableNode;
 use Doctrine\Common\Cache\ArrayCache;
 use Akamon\OAuth2\Server\Model\Client\ClientRepositoryInterface;
 use Akamon\OAuth2\Server\Model\AccessToken\AccessTokenRepositoryInterface;
+use Akamon\OAuth2\Server\Model\RefreshToken\RefreshTokenRepositoryInterface;
 use Akamon\OAuth2\Server\OAuth2Server;
 use felpado as f;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,6 +36,8 @@ class FeatureContext extends BehatContext
     private $clientRepository;
     /** @var AccessTokenRepositoryInterface */
     private $accessTokenRepository;
+    /** @var RefreshTokenRepositoryInterface */
+    private $refreshTokenRepository;
     /** @var OAuth2Server */
     private $server;
 
@@ -54,13 +58,14 @@ class FeatureContext extends BehatContext
         $this->clientRepository = new FileClientRepository(tempnam(sys_get_temp_dir(), 'akamon-oauth2-server-clients'));
 
         $this->accessTokenRepository = new DoctrineCacheAccessTokenRepository(new ArrayCache());
-        $refreshTokenRepository = new DoctrineCacheRefreshTokenRepository(new ArrayCache());
+        $this->refreshTokenRepository = new DoctrineCacheRefreshTokenRepository(new ArrayCache());
 
-        $storage = new Storage($this->clientRepository, $this->accessTokenRepository, $refreshTokenRepository);
+        $storage = new Storage($this->clientRepository, $this->accessTokenRepository, $this->refreshTokenRepository);
         $resourceProcessor = [$this, 'resourceProcessor'];
 
         $builder = new OAuth2ServerBuilder($storage, $resourceProcessor);
-        $builder->addResourceOwnerPasswordCredentialsGrant($this->createUserCredentialsChecker($this->users), $this->createUserIdObtainer($this->users));
+        $builder->addResourceOwnerPasswordCredentialsGrantType($this->createUserCredentialsChecker($this->users), $this->createUserIdObtainer($this->users));
+        $builder->addRefreshTokenGrantType();
 
         $this->server = $builder->build();
     }
@@ -192,9 +197,9 @@ class FeatureContext extends BehatContext
     }
 
     /**
-     * @Given /^I have an expired access token "([^"]*)"$/
+     * @Given /^there is an expired access token "([^"]*)"$/
      */
-    public function iHaveAnExpiredAccessToken($token)
+    public function thereIsAnExpiredAccessToken($token)
     {
         $accessToken = $this->createAccessToken([
             'token' => $token,
@@ -206,9 +211,9 @@ class FeatureContext extends BehatContext
     }
 
     /**
-     * @Given /^I have a valid access token "([^"]*)"$/
+     * @Given /^there is a valid access token "([^"]*)"$/
      */
-    public function iHaveAValidAccessToken($token)
+    public function thereIsAValidAccessToken($token)
     {
         $accessToken = $this->createAccessToken(['token' => $token]);
 
@@ -224,6 +229,20 @@ class FeatureContext extends BehatContext
             'userId' => mt_rand(),
             'lifetime' => 3600
         ], $params));
+    }
+
+    /**
+     * @Given /^there is a valid refresh token "([^"]*)" for the access token "([^"]*)"$/
+     */
+    public function thereIsAValidRefreshTokenForTheAccessToken($refreshTokenToken, $accessTokenToken)
+    {
+        $refreshToken = new RefreshToken([
+            'token' => $refreshTokenToken,
+            'accessTokenToken' => $accessTokenToken,
+            'expiresAt' => time() + 3600
+        ]);
+
+        $this->refreshTokenRepository->add($refreshToken);
     }
 
     /**

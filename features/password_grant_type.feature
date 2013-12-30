@@ -65,4 +65,5 @@ Feature: OAuth Token Grant Password
     And the oauth response format and cache are right
     And the response parameter "access_token" should exist
     And the response parameter "token_type" should be "bearer"
+    And the response parameter "refresh_token" should exist
     And the response parameter "expires_in" should be "3600"

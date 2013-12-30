@@ -27,28 +27,28 @@ class PersistentRefreshTokenCreatorTest extends OAuth2TestCase
 
     public function testCreate()
     {
-        $accessToken = $this->createAccessToken();
+        $accessTokenToken = 'foo';
         $refreshToken = $this->createRefreshToken();
 
-        $this->delegate->shouldReceive('create')->with($accessToken)->once()->andReturn($refreshToken)->globally()->ordered();
+        $this->delegate->shouldReceive('create')->with($accessTokenToken)->once()->andReturn($refreshToken)->globally()->ordered();
         $this->repository->shouldReceive('find')->with(f\get($refreshToken, 'token'))->once()->andReturnNull()->globally()->ordered();
         $this->repository->shouldReceive('add')->with($refreshToken)->once()->globally()->ordered();
 
-        $this->assertSame($refreshToken, $this->creator->create($accessToken));
+        $this->assertSame($refreshToken, $this->creator->create($accessTokenToken));
     }
 
     public function testShouldCheckUniqueness()
     {
-        $accessToken = $this->createAccessToken();
+        $accessTokenToken = 'ups';
         $refreshToken1 = $this->createRefreshToken();
         $refreshToken2 = $this->createRefreshToken();
 
-        $this->delegate->shouldReceive('create')->with($accessToken)->once()->andReturn($refreshToken1)->globally()->ordered();
+        $this->delegate->shouldReceive('create')->with($accessTokenToken)->once()->andReturn($refreshToken1)->globally()->ordered();
         $this->repository->shouldReceive('find')->with(f\get($refreshToken1, 'token'))->once()->andReturn($refreshToken1)->globally()->ordered();
-        $this->delegate->shouldReceive('create')->with($accessToken)->once()->andReturn($refreshToken2)->globally()->ordered();
+        $this->delegate->shouldReceive('create')->with($accessTokenToken)->once()->andReturn($refreshToken2)->globally()->ordered();
         $this->repository->shouldReceive('find')->with(f\get($refreshToken2, 'token'))->once()->andReturnNull()->globally()->ordered();
         $this->repository->shouldReceive('add')->once()->with($refreshToken2)->globally()->ordered();
 
-        $this->assertSame($refreshToken2, $this->creator->create($accessToken));
+        $this->assertSame($refreshToken2, $this->creator->create($accessTokenToken));
     }
 }

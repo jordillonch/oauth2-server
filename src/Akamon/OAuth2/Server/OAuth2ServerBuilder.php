@@ -12,11 +12,15 @@ use Akamon\OAuth2\Server\Service\Token\AccessTokenDataObtainer\BearerAccessToken
 use Akamon\OAuth2\Server\Service\Token\AccessTokenObtainer\AccessTokenObtainer;
 use Akamon\OAuth2\Server\Service\Token\RandomGenerator\ArrayRandRandomGenerator;
 use Akamon\OAuth2\Server\Service\Scope\ScopeObtainer\ScopeObtainer;
+use Akamon\OAuth2\Server\Service\Token\RefreshTokenCreator\PersistentRefreshTokenCreator;
+use Akamon\OAuth2\Server\Service\Token\RefreshTokenCreator\RefreshTokenCreator;
 use Akamon\OAuth2\Server\Service\Token\RequestAccessTokenObtainer\RequestAccessTokenObtainer;
+use Akamon\OAuth2\Server\Service\Token\TokenCreator\RefreshingTokenCreator;
 use Akamon\OAuth2\Server\Service\Token\TokenCreator\TokenCreator;
 use Akamon\OAuth2\Server\Service\Token\TokenGenerator\BearerTokenGenerator;
 use Akamon\OAuth2\Server\Service\Token\TokenGranter\TokenGranterByGrantType;
 use Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor\PasswordTokenGrantTypeProcessor;
+use Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor\RefreshTokenGrantTypeProcessor;
 use Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface;
 use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface;
 use Akamon\OAuth2\Server\Service\User\UserIdObtainer\UserIdObtainerInterface;
@@ -56,8 +60,11 @@ class OAuth2ServerBuilder
     private function createTokenCreator()
     {
         $accessTokenCreator = $this->createAccessTokenCreator();
+        $creator = new TokenCreator($accessTokenCreator);
 
-        return new TokenCreator($accessTokenCreator);
+        $refreshTokenCreator = $this->createRefreshTokenCreator();
+
+        return new RefreshingTokenCreator($creator, $refreshTokenCreator);
     }
 
     private function createAccessTokenCreator()
@@ -70,9 +77,26 @@ class OAuth2ServerBuilder
         return new PersistentAccessTokenCreator($creator, $accessTokenRepository);
     }
 
-    public function addResourceOwnerPasswordCredentialsGrant(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer)
+    private function createRefreshTokenCreator()
+    {
+        $params = ['lifetime' => 3600];
+        $creator = new RefreshTokenCreator($this->tokenGenerator, $params);
+
+        $repository = $this->storage->getRefreshTokenRepository();
+
+        return new PersistentRefreshTokenCreator($creator, $repository);
+    }
+
+    public function addResourceOwnerPasswordCredentialsGrantType(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer)
     {
         $processor = new PasswordTokenGrantTypeProcessor($userCredentialsChecker, $userIdObtainer, $this->scopeObtainer, $this->tokenCreator);
+
+        $this->addTokenGrantTypeProcessor($processor);
+    }
+
+    public function addRefreshTokenGrantType()
+    {
+        $processor = new RefreshTokenGrantTypeProcessor($this->storage->getRefreshTokenRepository(), $this->storage->getAccessTokenRepository(), $this->tokenCreator);
 
         $this->addTokenGrantTypeProcessor($processor);
     }
