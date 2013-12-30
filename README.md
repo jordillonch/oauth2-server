@@ -6,4 +6,4 @@ Pablo Díez - <pablodip@gmail.com>
 
 ## License
 
-Pagerfanta is licensed under the MIT License. See the LICENSE file for full details.
+Akamon OAuth2 Server is licensed under the MIT License. See the LICENSE file for full details.
