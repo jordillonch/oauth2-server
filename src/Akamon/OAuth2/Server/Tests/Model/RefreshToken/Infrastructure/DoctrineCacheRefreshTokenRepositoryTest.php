@@ -20,23 +20,27 @@ class DoctrineCacheRefreshTokenRepositoryTest extends RefreshTokenRepositoryTest
         parent::setUp();
 
         $this->cache = $this->mock('Doctrine\Common\Cache\Cache');
-        $this->repository = new \Akamon\OAuth2\Server\Model\RefreshToken\Infrastructure\DoctrineCacheRefreshTokenRepository($this->cache);
+        $this->repository = new DoctrineCacheRefreshTokenRepository($this->cache);
     }
 
     public function testAdd()
     {
         $refreshToken = $this->createRefreshToken();
-        $this->cache->shouldReceive('save')->once()->with(f\get($refreshToken, 'token'), $refreshToken->getParams(), $refreshToken->getLifetime());
+        $this->cache
+            ->shouldReceive('save')
+            ->once()
+            ->with(f\get($refreshToken, 'token'), $refreshToken->getParams(), $refreshToken->getLifetime())
+            ->andReturn(true);
 
-        $this->repository->add($refreshToken);
+        $this->assertTrue($this->repository->add($refreshToken));
     }
 
     public function testRemove()
     {
         $refreshToken = $this->createRefreshToken();
-        $this->cache->shouldReceive('delete')->once()->with(f\get($refreshToken, 'token'));
+        $this->cache->shouldReceive('delete')->once()->with(f\get($refreshToken, 'token'))->andReturn(true);
 
-        $this->repository->remove($refreshToken);
+        $this->assertTrue($this->repository->remove($refreshToken));
     }
 
     public function testFind()

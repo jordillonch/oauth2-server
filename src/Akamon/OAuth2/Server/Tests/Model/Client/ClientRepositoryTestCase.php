@@ -8,11 +8,15 @@ use felpado as f;
 
 abstract class ClientRepositoryTestCase extends \PHPUnit_Framework_TestCase
 {
-    /** @var ClientRepositoryInterface */
-    private $repository;
+    /**
+     * @var ClientRepositoryInterface
+     */
+    protected $repository;
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->repository = $this->createRepository();
     }
 
