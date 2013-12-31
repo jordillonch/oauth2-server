@@ -1,8 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="Akamon OAuth2 Server" default="help">
+
     <target name="help" description="Help">
         <exec command="./vendor/bin/phing -l" passthru="true" />
+    </target>
+
+    <target name="composer-install" description="Run composer install to load all dependencies">
+        <composer composer="/usr/local/bin/composer" command="install">
+            <arg value="-o"/>
+            <arg value="--prefer-dist"/>
+        </composer>
+    </target>
+
+    <target name="php-lint" description="Check PHP syntax errors">
+        <phplint haltonfailure="true" deprecatedAsError="true">
+            <fileset dir="${project.basedir}">
+                <include name="src/**/*.php"/>
+                <include name="features/**/*.php"/>
+            </fileset>
+        </phplint>
     </target>
 
     <target name="phpunit" description="Unit Tests">
@@ -10,7 +27,9 @@
     </target>
 
     <target name="phpunit-coverage" description="Unit Tests with Coverage">
-        <exec command="./vendor/bin/phpunit --coverage-text" passthru="true"/>
+        <delete dir="build/coverage"/>
+        <delete dir="build/logs/phpunit"/>
+        <exec command="./vendor/bin/phpunit -c phpunit-coverage.xml" passthru="true"/>
     </target>
 
     <target name="behat" description="Acceptance Tests">
@@ -21,4 +40,5 @@
         <phingcall target="phpunit" />
         <phingcall target="behat" />
     </target>
+
 </project>
