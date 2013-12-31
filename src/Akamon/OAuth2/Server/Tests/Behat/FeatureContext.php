@@ -248,6 +248,20 @@ class FeatureContext extends BehatContext
     }
 
     /**
+     * @Given /^there is an expired refresh token "([^"]*)" for the access token "([^"]*)"$/
+     */
+    public function thereIsAnExpiredRefreshTokenForTheAccessToken($refreshTokenToken, $accessTokenToken)
+    {
+        $refreshToken = new RefreshToken([
+            'token' => $refreshTokenToken,
+            'accessTokenToken' => $accessTokenToken,
+            'expiresAt' => time() - 1
+        ]);
+
+        $this->refreshTokenRepository->add($refreshToken);
+    }
+
+    /**
      * @When /^I add the http basic authentication header with "([^"]*)" and "([^"]*)"$/
      */
     public function iAddTheHttpBasicAuthenticationHeaderWithAnd($username, $password)

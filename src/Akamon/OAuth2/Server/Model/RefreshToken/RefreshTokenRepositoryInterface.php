@@ -10,5 +10,8 @@ interface RefreshTokenRepositoryInterface
 
     function remove(RefreshToken $refreshToken);
 
+    /**
+     * @return RefreshToken|null
+     */
     function find($token);
 }

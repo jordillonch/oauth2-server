@@ -57,6 +57,18 @@ class RefreshTokenGrantTypeProcessorTest extends OAuth2TestCase
     }
 
     /**
+     * @expectedException \Akamon\OAuth2\Server\Exception\OAuthError\ExpiredRefreshTokenOAuthErrorException
+     */
+    public function testItThrowsAnExceptionIfTheRefreshTokenIsExpired()
+    {
+        $refreshToken = $this->createRefreshToken(['expiresAt' => time() - 1]);
+
+        $this->refreshTokenRepository->shouldReceive('find')->with(f\get($refreshToken, 'token'))->once()->andReturn($refreshToken);
+
+        $this->processor->process($this->createClient(), ['refresh_token' => f\get($refreshToken, 'token')]);
+    }
+
+    /**
      * @expectedException \Akamon\OAuth2\Server\Exception\OAuthError\InvalidRefreshTokenOAuthErrorException
      */
     public function testItThrowsAnExceptionIfThereAccessTokenDoesNotExist()

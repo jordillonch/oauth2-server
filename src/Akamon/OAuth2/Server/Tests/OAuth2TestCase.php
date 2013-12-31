@@ -26,11 +26,11 @@ class OAuth2TestCase extends \PHPUnit_Framework_TestCase
 
     protected function createRefreshToken(array $params = array())
     {
-        return new RefreshToken([
+        return new RefreshToken(array_replace([
             'token' => sha1(microtime().mt_rand()),
             'accessTokenToken' => 'foo',
             'expiresAt' => time() + 3600
-        ]);
+        ], $params));
     }
 
     /**
