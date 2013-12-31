@@ -24,6 +24,18 @@ Feature: Refresh Token
     And the response parameter "error" should be "invalid_request"
     And the response parameter "message" should be "Refresh token is invalid."
 
+  Scenario: Expired refresh token
+    Given there is an expired access token "foo"
+    And there is an expired refresh token "bar" for the access token "foo"
+    When I add the http basic authentication for the client "pablodip" and "abc"
+    And I add the request parameter "grant_type" with "refresh_token"
+    And I add the request parameter "refresh_token" with "bar"
+    And I make a token request
+    Then the response status code should be "400"
+    And the oauth response format and cache are right
+    And the response parameter "error" should be "invalid_request"
+    And the response parameter "message" should be "Refresh token is expired."
+
   Scenario: Refreshing OK
     Given there is a valid access token "foo"
     And there is a valid refresh token "bar" for the access token "foo"

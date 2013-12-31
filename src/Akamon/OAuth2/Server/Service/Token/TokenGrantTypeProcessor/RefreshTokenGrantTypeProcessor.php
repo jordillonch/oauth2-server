@@ -2,6 +2,7 @@
 
 namespace Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor;
 
+use Akamon\OAuth2\Server\Exception\OAuthError\ExpiredRefreshTokenOAuthErrorException;
 use Akamon\OAuth2\Server\Exception\OAuthError\InvalidRefreshTokenOAuthErrorException;
 use Akamon\OAuth2\Server\Exception\OAuthError\RefreshTokenNotFoundOAuthErrorException;
 use Akamon\OAuth2\Server\Model\AccessToken\AccessTokenRepositoryInterface;
@@ -45,6 +46,10 @@ class RefreshTokenGrantTypeProcessor implements TokenGrantTypeProcessorInterface
         $refreshToken = $this->refreshTokenRepository->find(f\get($inputData, 'refresh_token'));
         if (f\not($refreshToken)) {
             throw new InvalidRefreshTokenOAuthErrorException();
+        }
+
+        if ($refreshToken->isExpired()) {
+            throw new ExpiredRefreshTokenOAuthErrorException();
         }
 
         $accessToken = $this->accessTokenRepository->find(f\get($refreshToken, 'accessTokenToken'));

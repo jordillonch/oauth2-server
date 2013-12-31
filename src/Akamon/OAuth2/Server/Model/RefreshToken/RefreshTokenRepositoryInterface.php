@@ -22,7 +22,7 @@ interface RefreshTokenRepositoryInterface
     /**
      * @param $token
      *
-     * @return RefreshToken
+     * @return RefreshToken|null
      */
     function find($token);
 }
