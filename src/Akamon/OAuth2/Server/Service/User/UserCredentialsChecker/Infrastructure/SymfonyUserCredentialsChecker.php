@@ -2,7 +2,7 @@
 
 namespace Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\Infrastructure;
 
-use Akamon\OAuth2\Server\Model\UserCredentials;
+use Akamon\OAuth2\Server\Model\User\UserCredentials;
 use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;

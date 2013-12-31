@@ -7,9 +7,10 @@ use Akamon\OAuth2\Server\Exception\UserNotFoundException;
 interface UserIdObtainerInterface
 {
     /**
-     * @return string
+     * @param $username
      *
      * @throws UserNotFoundException
+     * @return string
      */
     function getUserId($username);
 }

@@ -13,11 +13,6 @@ class CallbackUserIdObtainer implements UserIdObtainerInterface
         $this->callback = $callback;
     }
 
-    /**
-     * @return string
-     *
-     * @throws UserNotFoundException
-     */
     public function getUserId($username)
     {
         return call_user_func($this->callback, $username);

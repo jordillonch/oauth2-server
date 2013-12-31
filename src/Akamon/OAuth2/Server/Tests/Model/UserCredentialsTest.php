@@ -2,7 +2,7 @@
 
 namespace Akamon\OAuth2\Server\Tests\Model;
 
-use Akamon\OAuth2\Server\Model\UserCredentials;
+use Akamon\OAuth2\Server\Model\User\UserCredentials;
 
 class UserCredentialsTest extends \PHPUnit_Framework_TestCase
 {

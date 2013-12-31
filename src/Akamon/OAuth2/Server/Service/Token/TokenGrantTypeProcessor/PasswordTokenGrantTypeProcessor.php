@@ -6,7 +6,7 @@ use Akamon\OAuth2\Server\Exception\OAuthError\InvalidUserCredentialsOAuthErrorEx
 use Akamon\OAuth2\Server\Exception\OAuthError\UserCredentialsNotFoundException;
 use Akamon\OAuth2\Server\Model\Client\Client;
 use Akamon\OAuth2\Server\Model\Context;
-use Akamon\OAuth2\Server\Model\UserCredentials;
+use Akamon\OAuth2\Server\Model\User\UserCredentials;
 use Akamon\OAuth2\Server\Service\Scope\ScopeObtainer\ScopeObtainerInterface;
 use Akamon\OAuth2\Server\Service\Token\TokenCreator\TokenCreatorInterface;
 use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface;
@@ -15,13 +15,19 @@ use felpado as f;
 
 class PasswordTokenGrantTypeProcessor implements TokenGrantTypeProcessorInterface
 {
+    const GRANT_TYPE = 'password';
+
     private $userCredentialsChecker;
     private $userIdObtainer;
     private $scopeObtainer;
     private $tokenCreator;
 
-    public function __construct(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer, ScopeObtainerInterface $scopeObtainer, TokenCreatorInterface $tokenCreator)
-    {
+    public function __construct(
+        UserCredentialsCheckerInterface $userCredentialsChecker,
+        UserIdObtainerInterface $userIdObtainer,
+        ScopeObtainerInterface $scopeObtainer,
+        TokenCreatorInterface $tokenCreator
+    ) {
         $this->userCredentialsChecker = $userCredentialsChecker;
         $this->userIdObtainer = $userIdObtainer;
         $this->scopeObtainer = $scopeObtainer;
@@ -30,7 +36,7 @@ class PasswordTokenGrantTypeProcessor implements TokenGrantTypeProcessorInterfac
 
     public function getGrantType()
     {
-        return 'password';
+        return self::GRANT_TYPE;
     }
 
     public function process(Client $client, array $inputData)

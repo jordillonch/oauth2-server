@@ -2,7 +2,7 @@
 
 namespace Akamon\OAuth2\Server\Tests\Service\User\UserCredentialsChecker;
 
-use Akamon\OAuth2\Server\Model\UserCredentials;
+use Akamon\OAuth2\Server\Model\User\UserCredentials;
 use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\CallbackUserCredentialsChecker;
 use Akamon\OAuth2\Server\Tests\OAuth2TestCase;
 

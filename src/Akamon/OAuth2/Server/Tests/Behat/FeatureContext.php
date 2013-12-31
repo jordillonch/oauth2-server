@@ -3,45 +3,61 @@
 namespace Akamon\OAuth2\Server\Tests\Behat;
 
 
-use Akamon\OAuth2\Server\Exception\UserNotFoundException;
-use Akamon\OAuth2\Server\Model\AccessToken\AccessToken;
-use Akamon\OAuth2\Server\Model\Client\Client;
-use Akamon\OAuth2\Server\Model\RefreshToken\RefreshToken;
-use Akamon\OAuth2\Server\Model\UserCredentials;
-use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\CallbackUserCredentialsChecker;
-use Behat\Behat\Context\BehatContext;
 use Akamon\Behat\ApiContext\ApiContext;
 use Akamon\Behat\ApiContext\ParameterAccessor\DeepArrayParameterAccessor;
 use Akamon\Behat\ApiContext\ResponseParametersProcessor\JsonResponseParametersProcessor;
+use Akamon\OAuth2\Server\Model\AccessToken\AccessToken;
+use Akamon\OAuth2\Server\Model\AccessToken\AccessTokenRepositoryInterface;
 use Akamon\OAuth2\Server\Model\AccessToken\Infrastructure\DoctrineCacheAccessTokenRepository;
+use Akamon\OAuth2\Server\Model\Client\Client;
+use Akamon\OAuth2\Server\Model\Client\ClientRepositoryInterface;
 use Akamon\OAuth2\Server\Model\Client\Infrastructure\FileClientRepository;
 use Akamon\OAuth2\Server\Model\RefreshToken\Infrastructure\DoctrineCacheRefreshTokenRepository;
+use Akamon\OAuth2\Server\Model\RefreshToken\RefreshToken;
+use Akamon\OAuth2\Server\Model\RefreshToken\RefreshTokenRepositoryInterface;
+use Akamon\OAuth2\Server\Model\User\UserCredentials;
+use Akamon\OAuth2\Server\Model\User\UserCredentialsCollection;
+use Akamon\OAuth2\Server\OAuth2Server;
 use Akamon\OAuth2\Server\OAuth2ServerBuilder;
-use Akamon\OAuth2\Server\Service\User\UserIdObtainer\CallbackUserIdObtainer;
+use Akamon\OAuth2\Server\Service\User\UserCredentialsChecker\CallbackUserCredentialsChecker;
 use Akamon\OAuth2\Server\Storage;
+use Behat\Behat\Context\BehatContext;
 use Behat\Gherkin\Node\TableNode;
 use Doctrine\Common\Cache\ArrayCache;
-use Akamon\OAuth2\Server\Model\Client\ClientRepositoryInterface;
-use Akamon\OAuth2\Server\Model\AccessToken\AccessTokenRepositoryInterface;
-use Akamon\OAuth2\Server\Model\RefreshToken\RefreshTokenRepositoryInterface;
-use Akamon\OAuth2\Server\OAuth2Server;
 use felpado as f;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class FeatureContext extends BehatContext
 {
+    /**
+     * @var UserCredentialsCollection
+     */
     private $users;
-    /** @var ClientRepositoryInterface */
+
+    /**
+     * @var ClientRepositoryInterface
+     */
     private $clientRepository;
-    /** @var AccessTokenRepositoryInterface */
+
+    /**
+     * @var AccessTokenRepositoryInterface
+     */
     private $accessTokenRepository;
-    /** @var RefreshTokenRepositoryInterface */
+
+    /**
+     * @var RefreshTokenRepositoryInterface
+     */
     private $refreshTokenRepository;
-    /** @var OAuth2Server */
+
+    /**
+     * @var OAuth2Server
+     */
     private $server;
 
-    /** @var OAuth2Client */
+    /**
+     * @var OAuth2Client
+     */
     private $client;
 
     public function __construct()
@@ -54,7 +70,7 @@ class FeatureContext extends BehatContext
 
     private function createServer()
     {
-        $this->users = new \ArrayObject();
+        $this->users = new UserCredentialsCollection();
         $this->clientRepository = new FileClientRepository(tempnam(sys_get_temp_dir(), 'akamon-oauth2-server-clients'));
 
         $this->accessTokenRepository = new DoctrineCacheAccessTokenRepository(new ArrayCache());
@@ -66,7 +82,10 @@ class FeatureContext extends BehatContext
         $resourceProcessor = [$this, 'resourceProcessor'];
 
         $builder = new OAuth2ServerBuilder($storage, ['lifetime' => $lifetime, 'resource_processor' => $resourceProcessor]);
-        $builder->addResourceOwnerPasswordCredentialsGrantType($this->createUserCredentialsChecker($this->users), $this->createUserIdObtainer($this->users));
+        $builder->addResourceOwnerPasswordCredentialsGrantType(
+            $this->createUserCredentialsChecker($this->users),
+            $this->users
+        );
         $builder->addRefreshTokenGrantType();
 
         $this->server = $builder->build();
@@ -81,34 +100,16 @@ class FeatureContext extends BehatContext
         return $response;
     }
 
-    private function createUserIdObtainer($users)
-    {
-        $getId = function ($username) use ($users) {
-            $isUser = function ($user) use ($username) {
-                return $user['username'] === $username;
-            };
-
-            $user = f\find($isUser, $users);
-            if ($user) {
-                return $user['id'];
-            };
-
-            throw new UserNotFoundException();
-        };
-
-        return new CallbackUserIdObtainer($getId);
-    }
-
-    private function createUserCredentialsChecker($users)
+    private function createUserCredentialsChecker(UserCredentialsCollection $users)
     {
         $check = function (UserCredentials $userCredentials) use ($users) {
-            $isUser = function ($user) use ($userCredentials) {
-                return $user['username'] === $userCredentials->getUsername();
+            $isUser = function (UserCredentials $user) use ($userCredentials) {
+                return $user->getUsername() === $userCredentials->getUsername();
             };
 
             $user = f\find($isUser, $users);
             if ($user) {
-                return $user['password'] === $userCredentials->getPassword();
+                return $user->getPassword() === $userCredentials->getPassword();
             };
 
             return false;
@@ -128,7 +129,9 @@ class FeatureContext extends BehatContext
         return $apiContext;
     }
 
-    /** @return ApiContext */
+    /**
+     * @return ApiContext
+     */
     public function getApiContext()
     {
         return $this->getSubContext('api');
@@ -181,11 +184,7 @@ class FeatureContext extends BehatContext
      */
     public function thereIsAUserWithPassword($username, $password)
     {
-        $this->users[] = [
-            'id' => count($this->users) ? f\last(f\keys($this->users)) : 1,
-            'username' => $username,
-            'password' => $password
-        ];
+        $this->users->add(new UserCredentials($username, $password));
     }
 
     /**

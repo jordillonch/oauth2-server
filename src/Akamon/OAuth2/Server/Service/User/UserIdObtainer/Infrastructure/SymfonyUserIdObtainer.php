@@ -20,11 +20,6 @@ class SymfonyUserIdObtainer implements UserIdObtainerInterface
         $this->method = $method;
     }
 
-    /**
-     * @return string
-     *
-     * @throws UserNotFoundException
-     */
     public function getUserId($username)
     {
         $method = f\method($this->method);

@@ -3,7 +3,7 @@
 namespace Akamon\OAuth2\Server\Tests\Service\Token\TokenGrantTypeProcessor;
 
 use Akamon\OAuth2\Server\Model\Context;
-use Akamon\OAuth2\Server\Model\UserCredentials;
+use Akamon\OAuth2\Server\Model\User\UserCredentials;
 use Akamon\OAuth2\Server\Service\Token\TokenGrantTypeProcessor\PasswordTokenGrantTypeProcessor;
 use Akamon\OAuth2\Server\Tests\OAuth2TestCase;
 use Mockery\MockInterface;

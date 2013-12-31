@@ -1,6 +1,6 @@
 <?php
 
-namespace Akamon\OAuth2\Server\Model;
+namespace Akamon\OAuth2\Server\Model\User;
 
 class UserCredentials
 {
