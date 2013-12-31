@@ -10,9 +10,14 @@ use felpado as f;
 
 class DoctrineCacheAccessTokenRepositoryTest extends AccessTokenRepositoryTestCase
 {
-    /** @var MockInterface */
+    /**
+     * @var MockInterface
+     */
     private $cache;
-    /** @var DoctrineCacheAccessTokenRepository */
+
+    /**
+     * @var DoctrineCacheAccessTokenRepository
+     */
     private $repository;
 
     protected function setUp()
@@ -31,9 +36,9 @@ class DoctrineCacheAccessTokenRepositoryTest extends AccessTokenRepositoryTestCa
         $value = $accessToken->getParams();
         $lifetime = $accessToken->lifetimeFromNow();
 
-        $this->cache->shouldReceive('save')->once()->with($key, $value, $lifetime);
+        $this->cache->shouldReceive('save')->once()->with($key, $value, $lifetime)->andReturn(true);
 
-        $this->repository->add($accessToken);
+        $this->assertTrue($this->repository->add($accessToken));
     }
 
     public function testRemove()
@@ -41,9 +46,9 @@ class DoctrineCacheAccessTokenRepositoryTest extends AccessTokenRepositoryTestCa
         $accessToken = $this->createAccessToken();
 
         $key = f\get($accessToken, 'token');
-        $this->cache->shouldReceive('delete')->once()->with($key);
+        $this->cache->shouldReceive('delete')->once()->with($key)->andReturn(true);
 
-        $this->repository->remove($accessToken);
+        $this->assertTrue($this->repository->remove($accessToken));
     }
 
     public function testFind()

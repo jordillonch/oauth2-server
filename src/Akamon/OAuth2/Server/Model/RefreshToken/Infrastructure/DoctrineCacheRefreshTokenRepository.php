@@ -18,12 +18,12 @@ class DoctrineCacheRefreshTokenRepository implements RefreshTokenRepositoryInter
 
     public function add(RefreshToken $refreshToken)
     {
-        $this->cache->save(f\get($refreshToken, 'token'), $refreshToken->getParams(), $refreshToken->getLifetime());
+        return $this->cache->save(f\get($refreshToken, 'token'), $refreshToken->getParams(), $refreshToken->getLifetime());
     }
 
     public function remove(RefreshToken $refreshToken)
     {
-        $this->cache->delete(f\get($refreshToken, 'token'));
+        return $this->cache->delete(f\get($refreshToken, 'token'));
     }
 
     public function find($token)

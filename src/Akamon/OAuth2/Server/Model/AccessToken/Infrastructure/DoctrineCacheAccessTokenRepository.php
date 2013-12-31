@@ -22,14 +22,14 @@ class DoctrineCacheAccessTokenRepository implements AccessTokenRepositoryInterfa
         $value = $accessToken->getParams();
         $lifetime = f\get($accessToken, 'lifetime');
 
-        $this->cache->save($key, $value, $lifetime);
+        return $this->cache->save($key, $value, $lifetime);
     }
 
     public function remove(AccessToken $accessToken)
     {
         $key = f\get($accessToken, 'token');
 
-        $this->cache->delete($key);
+        return $this->cache->delete($key);
     }
 
     public function find($token)
