@@ -20,8 +20,7 @@
         "symfony/finder": "~2.4"
     },
     "autoload": {
-        "psr-0": {"Akamon\\OAuth2\\Server\\": "src/"},
-        "classmap": ["src"]
+        "psr-0": {"Akamon\\OAuth2\\Server\\": "src/"}
     },
     "repositories": [
         {

@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "e5adb3bcc45fc47b9f06a707d48ba2ba",
+    "hash": "fa485c37ec846d45a141c387cd633bb6",
     "packages": [
         {
             "name": "pablodip/felpado",
