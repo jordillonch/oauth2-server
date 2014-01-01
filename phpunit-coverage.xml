@@ -17,8 +17,11 @@
     verbose="false">
 
     <testsuites>
-        <testsuite name="Akamon OAuth2 Server">
-            <directory>./src/Akamon/OAuth2/Server/Tests</directory>
+        <testsuite name="Akamon OAuth2 Server Domain">
+            <directory>./src/Akamon/OAuth2/Server/Domain/Tests</directory>
+        </testsuite>
+        <testsuite name="Akamon OAuth2 Server Infrastructure">
+            <directory>./src/Akamon/OAuth2/Server/Infrastructure/Tests</directory>
         </testsuite>
     </testsuites>
 
@@ -26,7 +29,9 @@
         <whitelist>
             <directory>./src</directory>
             <exclude>
-                <directory>./src/Akamon/OAuth2/Server/Tests</directory>
+                <directory>./src/Akamon/OAuth2/Server/Behat</directory>
+                <directory>./src/Akamon/OAuth2/Server/Domain/Tests</directory>
+                <directory>./src/Akamon/OAuth2/Server/Infrastructure/Tests</directory>
             </exclude>
         </whitelist>
     </filter>
