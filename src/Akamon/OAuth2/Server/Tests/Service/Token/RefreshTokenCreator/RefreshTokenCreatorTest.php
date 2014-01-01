@@ -37,7 +37,8 @@ class RefreshTokenCreatorTest extends OAuth2TestCase
         $this->assertSame([
             'token' => $token,
             'accessTokenToken' => 'foo',
-            'expiresAt' => time() + $this->lifetime
+            'createdAt' => time(),
+            'lifetime' => $this->lifetime
         ], $refreshToken->getParams());
     }
 }

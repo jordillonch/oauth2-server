@@ -61,7 +61,7 @@ class RefreshTokenGrantTypeProcessorTest extends OAuth2TestCase
      */
     public function testItThrowsAnExceptionIfTheRefreshTokenIsExpired()
     {
-        $refreshToken = $this->createRefreshToken(['expiresAt' => time() - 1]);
+        $refreshToken = $this->createRefreshToken(['createdAt' => time(), 'lifetime' => 0]);
 
         $this->refreshTokenRepository->shouldReceive('find')->with(f\get($refreshToken, 'token'))->once()->andReturn($refreshToken);
 

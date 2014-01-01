@@ -11,11 +11,24 @@ class RefreshTokenTest extends \PHPUnit_Framework_TestCase
         $params = [
             'token' => 'bar',
             'accessTokenToken' => 'foo',
-            'expiresAt' => '123'
+            'createdAt' => 2,
+            'lifetime' => 3600
         ];
 
         $refreshToken = new RefreshToken($params);
         $this->assertSame($params, $refreshToken->getParams());
+    }
+
+    public function testGetExpiresAtReturnsCreatedAtPlusLifetime()
+    {
+        $refreshToken = new RefreshToken([
+            'accessTokenToken' => 'foo',
+            'token' => 'bar',
+            'createdAt' => 3,
+            'lifetime' => 200
+        ]);
+
+        $this->assertSame(203, $refreshToken->expiresAt());
     }
 
     public function testIsExpiredShouldReturnTrueWhenExpiredAtIsLessThanTime()
@@ -23,7 +36,8 @@ class RefreshTokenTest extends \PHPUnit_Framework_TestCase
         $refreshToken = new RefreshToken([
             'accessTokenToken' => 'foo',
             'token' => 'bar',
-            'expiresAt' => time() - 1
+            'createdAt' => time() - 60,
+            'lifetime' => 59
         ]);
 
         $this->assertTrue($refreshToken->isExpired());
@@ -32,9 +46,10 @@ class RefreshTokenTest extends \PHPUnit_Framework_TestCase
     public function testIsExpiredShouldReturnTrueWhenExpiredAtIsEqualToTime()
     {
         $refreshToken = new RefreshToken([
-                'accessTokenToken' => 'foo',
-                'token' => 'bar',
-                'expiresAt' => time()
+            'accessTokenToken' => 'foo',
+            'token' => 'bar',
+            'createdAt' => time() - 3600,
+            'lifetime' => 3600
         ]);
 
         $this->assertTrue($refreshToken->isExpired());
@@ -45,31 +60,22 @@ class RefreshTokenTest extends \PHPUnit_Framework_TestCase
         $refreshToken = new RefreshToken([
             'accessTokenToken' => 'foo',
             'token' => 'bar',
-            'expiresAt' => time() + 1
+            'createdAt' => time() - 60,
+            'lifetime' => 61
         ]);
 
         $this->assertFalse($refreshToken->isExpired());
     }
 
-    public function testGetLifetimeShouldReturnTheExpiredAtMinusTime()
+    public function testGetLifetimeFromNowShouldReturnExpiresAtLessTime()
     {
         $refreshToken = new RefreshToken([
             'accessTokenToken' => 'foo',
             'token' => 'bar',
-            'expiresAt' => time() + 60
+            'createdAt' => time(),
+            'lifetime' => 60
         ]);
 
-        $this->assertSame(60, $refreshToken->getLifetime());
-    }
-
-    public function testGetLifetimeShouldReturn0WhenTheLifetimeIsNegative()
-    {
-        $refreshToken = new RefreshToken([
-            'accessTokenToken' => 'foo',
-            'token' => 'bar',
-            'expiresAt' => time() - 1
-        ]);
-
-        $this->assertSame(0, $refreshToken->getLifetime());
+        $this->assertSame($refreshToken->expiresAt() - time(), $refreshToken->lifetimeFromNow());
     }
 }

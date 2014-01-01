@@ -29,7 +29,7 @@ class DoctrineCacheRefreshTokenRepositoryTest extends RefreshTokenRepositoryTest
         $this->cache
             ->shouldReceive('save')
             ->once()
-            ->with(f\get($refreshToken, 'token'), $refreshToken->getParams(), $refreshToken->getLifetime())
+            ->with(f\get($refreshToken, 'token'), $refreshToken->getParams(), f\get($refreshToken, 'lifetime'))
             ->andReturn(true);
 
         $this->assertTrue($this->repository->add($refreshToken));

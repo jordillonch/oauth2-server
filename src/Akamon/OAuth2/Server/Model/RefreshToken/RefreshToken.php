@@ -18,7 +18,8 @@ class RefreshToken implements \IteratorAggregate
         return [
             'token' => f\required(['v' => 'is_string']),
             'accessTokenToken' => f\required(['v' => 'is_string']),
-            'expiresAt' => f\required(['v' => 'is_numeric'])
+            'createdAt' => f\required(['v' => 'is_int']),
+            'lifetime' => f\required(['v' => 'is_int'])
         ];
     }
 
@@ -32,13 +33,18 @@ class RefreshToken implements \IteratorAggregate
         return new \ArrayIterator($this->params);
     }
 
-    public function isExpired()
+    public function expiresAt()
     {
-        return f\get($this, 'expiresAt') <= time();
+        return f\get($this, 'createdAt') + f\get($this, 'lifetime');
     }
 
-    public function getLifetime()
+    public function isExpired()
     {
-        return max(f\get($this, 'expiresAt') - time(), 0);
+        return $this->expiresAt() <= time();
+    }
+
+    public function lifetimeFromNow()
+    {
+        return $this->expiresAt() - time();
     }
 }

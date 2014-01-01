@@ -28,7 +28,8 @@ class RefreshTokenCreator implements RefreshTokenCreatorInterface
         return new RefreshToken([
             'token' => $this->tokenGenerator->generate(),
             'accessTokenToken' => $accessTokenTokenToken,
-            'expiresAt' => time() + $this->lifetime
+            'createdAt' => time(),
+            'lifetime' => $this->lifetime
         ]);
     }
 }

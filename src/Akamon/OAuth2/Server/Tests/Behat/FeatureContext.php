@@ -241,7 +241,8 @@ class FeatureContext extends BehatContext
         $refreshToken = new RefreshToken([
             'token' => $refreshTokenToken,
             'accessTokenToken' => $accessTokenToken,
-            'expiresAt' => time() + 3600
+            'createdAt' => time(),
+            'lifetime' => 3600
         ]);
 
         $this->refreshTokenRepository->add($refreshToken);
@@ -255,7 +256,8 @@ class FeatureContext extends BehatContext
         $refreshToken = new RefreshToken([
             'token' => $refreshTokenToken,
             'accessTokenToken' => $accessTokenToken,
-            'expiresAt' => time() - 1
+            'createdAt' => time() - 3601,
+            'lifetime' => 3600
         ]);
 
         $this->refreshTokenRepository->add($refreshToken);
