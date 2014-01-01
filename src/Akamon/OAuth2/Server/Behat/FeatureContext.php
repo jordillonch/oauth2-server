@@ -161,6 +161,13 @@ class FeatureContext extends BehatContext
     }
 
     /**
+     * @Given /^there are scopes:$/
+     */
+    public function thereAreScopes(TableNode $table)
+    {
+    }
+
+    /**
      * @Given /^there are clients:$/
      */
     public function thereAreOauthClients(TableNode $table)
