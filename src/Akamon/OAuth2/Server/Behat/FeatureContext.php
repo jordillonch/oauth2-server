@@ -2,16 +2,14 @@
 
 namespace Akamon\OAuth2\Server\Behat;
 
-
-use Akamon\OAuth2\Server\Domain\Exception\UserNotFoundException;
 use Akamon\OAuth2\Server\Domain\Model\AccessToken\AccessToken;
 use Akamon\OAuth2\Server\Domain\Model\Client\Client;
 use Akamon\OAuth2\Server\Domain\Model\RefreshToken\RefreshToken;
 use Akamon\OAuth2\Server\Domain\Model\Scope\Scope;
 use Akamon\OAuth2\Server\Domain\Model\Scope\ScopeRepositoryInterface;
-use Akamon\OAuth2\Server\Domain\Model\UserCredentials;
-use Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\CallbackUserCredentialsChecker;
 use Akamon\OAuth2\Server\Infrastructure\Memory\MemoryScopeRepository;
+use Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\IterableUserCredentialsChecker;
+use Akamon\OAuth2\Server\Domain\Service\User\UserIdObtainer\IterableUserIdObtainer;
 use Behat\Behat\Context\BehatContext;
 use Akamon\Behat\ApiContext\ApiContext;
 use Akamon\Behat\ApiContext\ParameterAccessor\DeepArrayParameterAccessor;
@@ -20,7 +18,6 @@ use Akamon\OAuth2\Server\Infrastructure\DoctrineCache\DoctrineCacheAccessTokenRe
 use Akamon\OAuth2\Server\Infrastructure\Filesystem\FileClientRepository;
 use Akamon\OAuth2\Server\Infrastructure\DoctrineCache\DoctrineCacheRefreshTokenRepository;
 use Akamon\OAuth2\Server\Domain\OAuth2ServerBuilder;
-use Akamon\OAuth2\Server\Domain\Service\User\UserIdObtainer\CallbackUserIdObtainer;
 use Akamon\OAuth2\Server\Domain\Storage;
 use Behat\Gherkin\Node\TableNode;
 use Doctrine\Common\Cache\ArrayCache;
@@ -67,7 +64,10 @@ class FeatureContext extends BehatContext
         $resourceProcessor = [$this, 'resourceProcessor'];
 
         $builder = new OAuth2ServerBuilder($storage, ['lifetime' => $lifetime, 'resource_processor' => $resourceProcessor]);
-        $builder->addResourceOwnerPasswordCredentialsGrantType($this->createUserCredentialsChecker($this->users), $this->createUserIdObtainer($this->users));
+
+        $userCredentialsChecker = new IterableUserCredentialsChecker($this->users);
+        $userIdObtainer = new IterableUserIdObtainer($this->users);
+        $builder->addResourceOwnerPasswordCredentialsGrantType($userCredentialsChecker, $userIdObtainer);
         $builder->addRefreshTokenGrantType();
 
         $this->server = $builder->build();
@@ -90,42 +90,6 @@ class FeatureContext extends BehatContext
         $response->setContent('My resource!');
 
         return $response;
-    }
-
-    private function createUserIdObtainer($users)
-    {
-        $getId = function ($username) use ($users) {
-            $isUser = function ($user) use ($username) {
-                return $user['username'] === $username;
-            };
-
-            $user = f\find($isUser, $users);
-            if ($user) {
-                return $user['id'];
-            };
-
-            throw new UserNotFoundException();
-        };
-
-        return new CallbackUserIdObtainer($getId);
-    }
-
-    private function createUserCredentialsChecker($users)
-    {
-        $check = function (UserCredentials $userCredentials) use ($users) {
-            $isUser = function ($user) use ($userCredentials) {
-                return $user['username'] === $userCredentials->getUsername();
-            };
-
-            $user = f\find($isUser, $users);
-            if ($user) {
-                return $user['password'] === $userCredentials->getPassword();
-            };
-
-            return false;
-        };
-
-        return new CallbackUserCredentialsChecker($check);
     }
 
     private function createApiContext()
