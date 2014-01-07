@@ -34,7 +34,7 @@ class AccessTokenCreator implements AccessTokenCreatorInterface
             'clientId' => f\get($context->getClient(), 'id'),
             'userId' => $context->getUserId(),
             'lifetime' => $this->lifetime,
-            'scope' => $context->getScope()
+            'scope' => $context->getScopes()->__toString()
         ]);
     }
 }

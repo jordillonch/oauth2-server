@@ -5,6 +5,7 @@ namespace Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver;
 use Akamon\OAuth2\Server\Domain\Exception\OAuthError\ScopeNotFoundOAuthErrorException;
 use Akamon\OAuth2\Server\Domain\Model\Context;
 use Akamon\OAuth2\Server\Domain\Model\Scope\ScopeRepositoryInterface;
+use felpado as f;
 
 class ScopeExistenceContextResolver implements ContextResolverInterface
 {
@@ -17,7 +18,10 @@ class ScopeExistenceContextResolver implements ContextResolverInterface
 
     public function resolve(Context $context)
     {
-        if (is_null($this->repository->find($context->getScope()))) {
+        $scopeExists = [$this->repository, 'find'];
+        $scopeNames = $context->getScopes()->getNames();
+
+        if (f\some(f\not_callback($scopeExists), $scopeNames)) {
             throw new ScopeNotFoundOAuthErrorException();
         }
 

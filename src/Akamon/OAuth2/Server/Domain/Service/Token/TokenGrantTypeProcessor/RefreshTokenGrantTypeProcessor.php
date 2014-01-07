@@ -9,6 +9,7 @@ use Akamon\OAuth2\Server\Domain\Model\AccessToken\AccessTokenRepositoryInterface
 use Akamon\OAuth2\Server\Domain\Model\Client\Client;
 use Akamon\OAuth2\Server\Domain\Model\Context;
 use Akamon\OAuth2\Server\Domain\Model\RefreshToken\RefreshTokenRepositoryInterface;
+use Akamon\OAuth2\Server\Domain\Model\Scope\ScopeCollection;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\TokenCreatorInterface;
 use felpado as f;
 
@@ -62,6 +63,6 @@ class RefreshTokenGrantTypeProcessor implements TokenGrantTypeProcessorInterface
         $this->refreshTokenRepository->remove($refreshToken);
         $this->accessTokenRepository->remove($accessToken);
 
-        return new Context($client, f\get($accessToken, 'userId'), f\get($accessToken, 'scope'));
+        return new Context($client, f\get($accessToken, 'userId'), ScopeCollection::createFromString(f\get($accessToken, 'scope')));
     }
 }

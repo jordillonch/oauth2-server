@@ -3,6 +3,8 @@
 namespace Akamon\OAuth2\Server\Domain\Tests\Service\Token\TokenGrantTypeProcessor;
 
 use Akamon\OAuth2\Server\Domain\Model\Context;
+use Akamon\OAuth2\Server\Domain\Model\Scope\Scope;
+use Akamon\OAuth2\Server\Domain\Model\Scope\ScopeCollection;
 use Akamon\OAuth2\Server\Domain\Model\UserCredentials;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\PasswordTokenGrantTypeProcessor;
 use Akamon\OAuth2\Server\Domain\Tests\OAuth2TestCase;
@@ -15,7 +17,7 @@ class PasswordTokenGrantTypeProcessorTest extends OAuth2TestCase
     /** @var MockInterface */
     private $userIdObtainer;
     /** @var MockInterface */
-    private $scopeObtainer;
+    private $scopesObtainer;
     /** @var MockInterface */
     private $tokenCreator;
 
@@ -26,10 +28,10 @@ class PasswordTokenGrantTypeProcessorTest extends OAuth2TestCase
     {
         $this->userCredentialsChecker = $this->mock('Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface');
         $this->userIdObtainer = $this->mock('Akamon\OAuth2\Server\Domain\Service\User\UserIdObtainer\UserIdObtainerInterface');
-        $this->scopeObtainer = $this->mock('Akamon\OAuth2\Server\Domain\Service\Scope\ScopeObtainer\ScopeObtainerInterface');
+        $this->scopesObtainer = $this->mock('Akamon\OAuth2\Server\Domain\Service\Scope\ScopesObtainer\ScopesObtainerInterface');
         $this->tokenCreator = $this->mock('Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\TokenCreatorInterface');
 
-        $this->processor = new PasswordTokenGrantTypeProcessor($this->userCredentialsChecker, $this->userIdObtainer, $this->scopeObtainer, $this->tokenCreator);
+        $this->processor = new PasswordTokenGrantTypeProcessor($this->userCredentialsChecker, $this->userIdObtainer, $this->scopesObtainer, $this->tokenCreator);
     }
 
     public function testGetGrantTypeShouldReturnPassword()
@@ -47,15 +49,16 @@ class PasswordTokenGrantTypeProcessorTest extends OAuth2TestCase
         $userCredentials = new UserCredentials($username, $password);
 
         $scope = 'all';
+        $scopes = new ScopeCollection([new Scope($scope)]);
 
-        $context = new Context($client, $userId, $scope);
+        $context = new Context($client, $userId, $scopes);
 
         $inputData = ['username' => $username, 'password' => $password, 'scope' => $scope];
         $parameters = new \stdClass();
 
         $this->userCredentialsChecker->shouldReceive('check')->once()->with(\Mockery::on(function ($v) use ($userCredentials) { return $v == $userCredentials; }))->andReturn(true);
         $this->userIdObtainer->shouldReceive('getUserId')->once()->with($username)->andReturn($userId);
-        $this->scopeObtainer->shouldReceive('getScope')->once()->with($inputData)->andReturn($scope);
+        $this->scopesObtainer->shouldReceive('getScopes')->once()->with($inputData)->andReturn($scopes);
         $this->tokenCreator->shouldReceive('create')->once()->with(\Mockery::on(function ($v) use ($context) { return $v == $context; }))->andReturn($parameters);
 
         $this->assertSame($parameters, $this->processor->process($client, $inputData));

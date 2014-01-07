@@ -7,7 +7,7 @@ use Akamon\OAuth2\Server\Domain\Exception\OAuthError\UserCredentialsNotFoundExce
 use Akamon\OAuth2\Server\Domain\Model\Client\Client;
 use Akamon\OAuth2\Server\Domain\Model\Context;
 use Akamon\OAuth2\Server\Domain\Model\UserCredentials;
-use Akamon\OAuth2\Server\Domain\Service\Scope\ScopeObtainer\ScopeObtainerInterface;
+use Akamon\OAuth2\Server\Domain\Service\Scope\ScopesObtainer\ScopesObtainerInterface;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\TokenCreatorInterface;
 use Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface;
 use Akamon\OAuth2\Server\Domain\Service\User\UserIdObtainer\UserIdObtainerInterface;
@@ -20,7 +20,7 @@ class PasswordTokenGrantTypeProcessor implements TokenGrantTypeProcessorInterfac
     private $scopeObtainer;
     private $tokenCreator;
 
-    public function __construct(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer, ScopeObtainerInterface $scopeObtainer, TokenCreatorInterface $tokenCreator)
+    public function __construct(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer, ScopesObtainerInterface $scopeObtainer, TokenCreatorInterface $tokenCreator)
     {
         $this->userCredentialsChecker = $userCredentialsChecker;
         $this->userIdObtainer = $userIdObtainer;
@@ -41,7 +41,7 @@ class PasswordTokenGrantTypeProcessor implements TokenGrantTypeProcessorInterfac
         }
 
         $userId = $this->userIdObtainer->getUserId($userCredentials->getUsername());
-        $scope = $this->scopeObtainer->getScope($inputData);
+        $scope = $this->scopeObtainer->getScopes($inputData);
 
         $context = new Context($client, $userId, $scope);
 

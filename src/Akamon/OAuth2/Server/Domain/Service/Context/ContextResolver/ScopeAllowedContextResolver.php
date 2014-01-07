@@ -10,9 +10,13 @@ class ScopeAllowedContextResolver implements ContextResolverInterface
 {
     public function resolve(Context $context)
     {
-        if (f\not($context->getClient()->hasAllowedScope($context->getScope()))) {
+        $isScopeAllowed = [$context->getClient(), 'hasAllowedScope'];
+        $scopeNames = $context->getScopes()->getNames();
+
+        if (f\not(f\some($isScopeAllowed, $scopeNames))) {
             throw new UnauthorizedClientForScopeOAuthErrorException();
         }
+
         return $context;
     }
 }

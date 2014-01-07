@@ -14,7 +14,7 @@ use Akamon\OAuth2\Server\Domain\Service\Client\ClientObtainer\AuthenticatedClien
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenDataObtainer\BearerAccessTokenDataObtainer;
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenObtainer\AccessTokenObtainer;
 use Akamon\OAuth2\Server\Domain\Service\Token\RandomGenerator\ArrayRandRandomGenerator;
-use Akamon\OAuth2\Server\Domain\Service\Scope\ScopeObtainer\ScopeObtainer;
+use Akamon\OAuth2\Server\Domain\Service\Scope\ScopesObtainer\ScopesObtainer;
 use Akamon\OAuth2\Server\Domain\Service\Token\RefreshTokenCreator\PersistentRefreshTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\RefreshTokenCreator\RefreshTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\RequestAccessTokenObtainer\RequestAccessTokenObtainer;
@@ -56,7 +56,7 @@ class OAuth2ServerBuilder
         $this->lifetime = $params['lifetime'];
         $this->resourceProcessor = $params['resource_processor'];
 
-        $this->scopeObtainer = new ScopeObtainer();
+        $this->scopeObtainer = new ScopesObtainer();
         $this->tokenGenerator = new BearerTokenGenerator(new ArrayRandRandomGenerator());
 
         $this->clientObtainer = $this->createClientObtainer();
