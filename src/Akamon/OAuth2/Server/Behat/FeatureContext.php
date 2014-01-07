@@ -7,8 +7,11 @@ use Akamon\OAuth2\Server\Domain\Exception\UserNotFoundException;
 use Akamon\OAuth2\Server\Domain\Model\AccessToken\AccessToken;
 use Akamon\OAuth2\Server\Domain\Model\Client\Client;
 use Akamon\OAuth2\Server\Domain\Model\RefreshToken\RefreshToken;
+use Akamon\OAuth2\Server\Domain\Model\Scope\Scope;
+use Akamon\OAuth2\Server\Domain\Model\Scope\ScopeRepositoryInterface;
 use Akamon\OAuth2\Server\Domain\Model\UserCredentials;
 use Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\CallbackUserCredentialsChecker;
+use Akamon\OAuth2\Server\Infrastructure\Memory\MemoryScopeRepository;
 use Behat\Behat\Context\BehatContext;
 use Akamon\Behat\ApiContext\ApiContext;
 use Akamon\Behat\ApiContext\ParameterAccessor\DeepArrayParameterAccessor;
@@ -32,12 +35,15 @@ use Symfony\Component\HttpFoundation\Response;
 class FeatureContext extends BehatContext
 {
     private $users;
+
     /** @var ClientRepositoryInterface */
     private $clientRepository;
     /** @var AccessTokenRepositoryInterface */
     private $accessTokenRepository;
     /** @var RefreshTokenRepositoryInterface */
     private $refreshTokenRepository;
+    /** @var ScopeRepositoryInterface */
+    private $scopeRepository;
     /** @var OAuth2Server */
     private $server;
 
@@ -55,12 +61,7 @@ class FeatureContext extends BehatContext
     private function createServer()
     {
         $this->users = new \ArrayObject();
-        $this->clientRepository = new FileClientRepository(tempnam(sys_get_temp_dir(), 'akamon-oauth2-server-clients'));
-
-        $this->accessTokenRepository = new DoctrineCacheAccessTokenRepository(new ArrayCache());
-        $this->refreshTokenRepository = new DoctrineCacheRefreshTokenRepository(new ArrayCache());
-
-        $storage = new Storage($this->clientRepository, $this->accessTokenRepository, $this->refreshTokenRepository);
+        $storage = $this->createStorage();
 
         $lifetime = 3600;
         $resourceProcessor = [$this, 'resourceProcessor'];
@@ -70,6 +71,16 @@ class FeatureContext extends BehatContext
         $builder->addRefreshTokenGrantType();
 
         $this->server = $builder->build();
+    }
+
+    private function createStorage()
+    {
+        $this->clientRepository = new FileClientRepository(tempnam(sys_get_temp_dir(), 'akamon-oauth2-server-clients'));
+        $this->accessTokenRepository = new DoctrineCacheAccessTokenRepository(new ArrayCache());
+        $this->refreshTokenRepository = new DoctrineCacheRefreshTokenRepository(new ArrayCache());
+        $this->scopeRepository = new MemoryScopeRepository();
+
+        return new Storage($this->clientRepository, $this->accessTokenRepository, $this->refreshTokenRepository, $this->scopeRepository);
     }
 
     public function resourceProcessor(Request $request, AccessToken $accessToken)
@@ -165,6 +176,9 @@ class FeatureContext extends BehatContext
      */
     public function thereAreScopes(TableNode $table)
     {
+        foreach ($table->getRows() as $row) {
+            $this->scopeRepository->add(new Scope($row[0]));
+        }
     }
 
     /**

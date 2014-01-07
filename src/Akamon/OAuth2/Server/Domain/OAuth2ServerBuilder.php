@@ -4,7 +4,7 @@ namespace Akamon\OAuth2\Server\Domain;
 
 use Akamon\OAuth2\Server\Domain\Controller\ResourceController;
 use Akamon\OAuth2\Server\Domain\Controller\TokenController;
-use Akamon\OAuth2\Server\Domain\OAuth2Server;
+use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\ScopeExistenceContextResolver;
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenCreator\AccessTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenCreator\PersistentAccessTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Client\ClientCredentialsObtainer\HttpBasicClientCredentialsObtainer;
@@ -17,6 +17,7 @@ use Akamon\OAuth2\Server\Domain\Service\Token\RefreshTokenCreator\PersistentRefr
 use Akamon\OAuth2\Server\Domain\Service\Token\RefreshTokenCreator\RefreshTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\RequestAccessTokenObtainer\RequestAccessTokenObtainer;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\RefreshingTokenCreator;
+use Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\ContextResolvedTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\TokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGenerator\BearerTokenGenerator;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGranter\TokenGranterByGrantType;
@@ -25,7 +26,6 @@ use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\RefreshTok
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface;
 use Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface;
 use Akamon\OAuth2\Server\Domain\Service\User\UserIdObtainer\UserIdObtainerInterface;
-use Akamon\OAuth2\Server\Domain\Storage;
 use felpado as f;
 
 class OAuth2ServerBuilder
@@ -71,11 +71,12 @@ class OAuth2ServerBuilder
     private function createTokenCreator()
     {
         $accessTokenCreator = $this->createAccessTokenCreator();
-        $creator = new TokenCreator($accessTokenCreator);
+        $accessingCreator = new TokenCreator($accessTokenCreator);
 
         $refreshTokenCreator = $this->createRefreshTokenCreator();
+        $refreshingCreator = new RefreshingTokenCreator($accessingCreator, $refreshTokenCreator);
 
-        return new RefreshingTokenCreator($creator, $refreshTokenCreator);
+        return new ContextResolvedTokenCreator($refreshingCreator, $this->createContextResolver());
     }
 
     private function createAccessTokenCreator()
@@ -96,6 +97,11 @@ class OAuth2ServerBuilder
         $repository = $this->storage->getRefreshTokenRepository();
 
         return new PersistentRefreshTokenCreator($creator, $repository);
+    }
+
+    private function createContextResolver()
+    {
+        return new ScopeExistenceContextResolver($this->storage->getScopeRepository());
     }
 
     public function addResourceOwnerPasswordCredentialsGrantType(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer)

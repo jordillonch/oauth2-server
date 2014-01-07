@@ -59,7 +59,7 @@ Feature: OAuth Token Grant Password
         | foo      | no       |
         | no       | bar      |
 
-  Scenario Outline: Inavlid scope
+  Scenario Outline: Invalid scope
     Given I add the http basic authentication for the client "pablodip" and "abc"
     When I add the request parameters:
         | grant_type | password |
@@ -75,7 +75,7 @@ Feature: OAuth Token Grant Password
     Examples:
         | scope    |
         | ups      |
-        | read,ups |
+        | read ups |
 
   Scenario Outline: Not allowed scope
     Given I add the http basic authentication for the client "pablodip" and "abc"
@@ -93,7 +93,7 @@ Feature: OAuth Token Grant Password
     Examples:
         | scope       |
         | delete      |
-        | read,delete |
+        | read delete |
         | all         |
 
   Scenario: Access Token Granted with client default scope
@@ -130,4 +130,4 @@ Feature: OAuth Token Grant Password
     Examples:
       | scope      |
       | write      |
-      | read,write |
+      | read write |
