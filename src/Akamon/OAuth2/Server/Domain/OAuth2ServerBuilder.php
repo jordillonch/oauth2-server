@@ -4,6 +4,8 @@ namespace Akamon\OAuth2\Server\Domain;
 
 use Akamon\OAuth2\Server\Domain\Controller\ResourceController;
 use Akamon\OAuth2\Server\Domain\Controller\TokenController;
+use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\ComposedContextResolver;
+use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\ScopeAllowedContextResolver;
 use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\ScopeExistenceContextResolver;
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenCreator\AccessTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenCreator\PersistentAccessTokenCreator;
@@ -101,7 +103,10 @@ class OAuth2ServerBuilder
 
     private function createContextResolver()
     {
-        return new ScopeExistenceContextResolver($this->storage->getScopeRepository());
+        return new ComposedContextResolver([
+            new ScopeExistenceContextResolver($this->storage->getScopeRepository()),
+            new ScopeAllowedContextResolver()
+        ]);
     }
 
     public function addResourceOwnerPasswordCredentialsGrantType(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer)
