@@ -6,7 +6,7 @@ use felpado as f;
 
 class ScopeCollection implements \IteratorAggregate
 {
-    private $scopes;
+    private $scopes = [];
 
     public function __construct(array $scopes)
     {
@@ -35,6 +35,11 @@ class ScopeCollection implements \IteratorAggregate
         return f\map(f\partial('felpado\get', f\_(), 'name'), $this);
     }
 
+    public function isEmpty()
+    {
+        return !!!$this->scopes;
+    }
+
     public function __toString()
     {
         return implode(' ', $this->getNames());
@@ -42,8 +47,13 @@ class ScopeCollection implements \IteratorAggregate
 
     public static function createFromString($string)
     {
-        $createScope = function ($name) { return new Scope($name); };
+        if ($string) {
+            $createScope = function ($name) { return new Scope($name); };
+            $scopes = f\map($createScope, explode(' ', $string));
+        } else {
+            $scopes = [];
+        }
 
-        return new ScopeCollection(f\map($createScope, explode(' ', $string)));
+        return new ScopeCollection($scopes);
     }
 }

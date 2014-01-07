@@ -5,6 +5,7 @@ namespace Akamon\OAuth2\Server\Domain;
 use Akamon\OAuth2\Server\Domain\Controller\ResourceController;
 use Akamon\OAuth2\Server\Domain\Controller\TokenController;
 use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\ComposedContextResolver;
+use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\DefaultClientScopeContextResolver;
 use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\ScopeAllowedContextResolver;
 use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\ScopeExistenceContextResolver;
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenCreator\AccessTokenCreator;
@@ -104,6 +105,7 @@ class OAuth2ServerBuilder
     private function createContextResolver()
     {
         return new ComposedContextResolver([
+            new DefaultClientScopeContextResolver(),
             new ScopeExistenceContextResolver($this->storage->getScopeRepository()),
             new ScopeAllowedContextResolver()
         ]);

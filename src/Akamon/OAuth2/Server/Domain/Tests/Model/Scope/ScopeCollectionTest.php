@@ -32,6 +32,12 @@ class ScopeCollectionTest extends OAuth2TestCase
         $this->assertSame(['foo', 'bar'], $coll->getNames());
     }
 
+    public function testIsEmpty()
+    {
+        $this->assertTrue((new ScopeCollection([]))->isEmpty());
+        $this->assertFalse((new ScopeCollection([new Scope('foo')]))->isEmpty());
+    }
+
     public function test__toString()
     {
         $scopes = [new Scope('foo'), new Scope('bar')];
@@ -42,6 +48,7 @@ class ScopeCollectionTest extends OAuth2TestCase
 
     public function testCreateFromString()
     {
+        $this->assertEquals(new ScopeCollection([]), ScopeCollection::createFromString(''));
         $this->assertEquals(new ScopeCollection([new Scope('foo')]), ScopeCollection::createFromString('foo'));
         $this->assertEquals(new ScopeCollection([new Scope('foo'), new Scope('bar')]), ScopeCollection::createFromString('foo bar'));
     }
