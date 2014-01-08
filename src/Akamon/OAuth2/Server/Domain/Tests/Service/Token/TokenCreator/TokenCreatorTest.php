@@ -11,12 +11,17 @@ class TokenCreatorTest extends OAuth2TestCase
 {
     /** @var Mock */
     private $accessTokenCreator;
+    /** @var Mock */
+    private $scopeResolver;
+
     /** @var TokenCreator */
     private $tokenCreator;
 
     protected function setUp()
     {
         $this->accessTokenCreator = $this->mock('Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenCreator\AccessTokenCreatorInterface');
+        $this->scopeResolver = $this->mock('Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenCreator\AccessTokenCreatorInterface');
+
         $this->tokenCreator = new TokenCreator($this->accessTokenCreator);
     }
 
@@ -32,7 +37,8 @@ class TokenCreatorTest extends OAuth2TestCase
         $this->assertSame([
             'access_token' => f\get($accessToken, 'token'),
             'token_type' => f\get($accessToken, 'type'),
-            'expires_in' => f\get($accessToken, 'lifetime')
+            'expires_in' => f\get($accessToken, 'lifetime'),
+            'scope' => f\get($accessToken, 'scope')
         ], $response);
     }
 }

@@ -5,6 +5,10 @@ namespace Akamon\OAuth2\Server\Behat;
 use Akamon\OAuth2\Server\Domain\Model\AccessToken\AccessToken;
 use Akamon\OAuth2\Server\Domain\Model\Client\Client;
 use Akamon\OAuth2\Server\Domain\Model\RefreshToken\RefreshToken;
+use Akamon\OAuth2\Server\Domain\Model\Scope\Scope;
+use Akamon\OAuth2\Server\Domain\Model\Scope\ScopeRepositoryInterface;
+use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\DirectTokenGrantTypeProcessor;
+use Akamon\OAuth2\Server\Infrastructure\Memory\MemoryScopeRepository;
 use Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\IterableUserCredentialsChecker;
 use Akamon\OAuth2\Server\Domain\Service\User\UserIdObtainer\IterableUserIdObtainer;
 use Behat\Behat\Context\BehatContext;
@@ -29,12 +33,18 @@ use Symfony\Component\HttpFoundation\Response;
 class FeatureContext extends BehatContext
 {
     private $users;
+
     /** @var ClientRepositoryInterface */
     private $clientRepository;
     /** @var AccessTokenRepositoryInterface */
     private $accessTokenRepository;
     /** @var RefreshTokenRepositoryInterface */
     private $refreshTokenRepository;
+    /** @var ScopeRepositoryInterface */
+    private $scopeRepository;
+
+    /** @var OAuth2ServerBuilder */
+    private $serverBuilder;
     /** @var OAuth2Server */
     private $server;
 
@@ -43,33 +53,71 @@ class FeatureContext extends BehatContext
 
     public function __construct()
     {
-        $this->createServer();
+        $this->users = new \ArrayObject();
+        $this->createRepositories();
 
-        $this->client = new OAuth2Client($this->server);
+        $this->client = new OAuth2Client();
         $this->useContext('api', $this->createApiContext());
     }
 
-    private function createServer()
+    private function createRepositories()
     {
-        $this->users = new \ArrayObject();
         $this->clientRepository = new FileClientRepository(tempnam(sys_get_temp_dir(), 'akamon-oauth2-server-clients'));
-
         $this->accessTokenRepository = new DoctrineCacheAccessTokenRepository(new ArrayCache());
         $this->refreshTokenRepository = new DoctrineCacheRefreshTokenRepository(new ArrayCache());
+        $this->scopeRepository = new MemoryScopeRepository();
+    }
 
-        $storage = new Storage($this->clientRepository, $this->accessTokenRepository, $this->refreshTokenRepository);
+    private function getServer()
+    {
+        if (is_null($this->server)) {
+            $this->server = $this->createServer();
+        }
+
+        return $this->server;
+    }
+
+    private function getServerBuilder()
+    {
+        if (f\not(is_null($this->server))) {
+            throw new \LogicException('The server is already built.');
+        }
+
+        if (is_null($this->serverBuilder)) {
+            $this->serverBuilder = $this->createServerBuilder();
+        }
+
+        return $this->serverBuilder;
+    }
+
+    private function createServerBuilder()
+    {
+        $storage = $this->createStorage();
 
         $lifetime = 3600;
         $resourceProcessor = [$this, 'resourceProcessor'];
 
         $builder = new OAuth2ServerBuilder($storage, ['lifetime' => $lifetime, 'resource_processor' => $resourceProcessor]);
 
+        return $builder;
+    }
+
+    private function createServer()
+    {
+        $builder = $this->getServerBuilder();
+
         $userCredentialsChecker = new IterableUserCredentialsChecker($this->users);
         $userIdObtainer = new IterableUserIdObtainer($this->users);
+
         $builder->addResourceOwnerPasswordCredentialsGrantType($userCredentialsChecker, $userIdObtainer);
         $builder->addRefreshTokenGrantType();
 
-        $this->server = $builder->build();
+        return $builder->build();
+    }
+
+    private function createStorage()
+    {
+        return new Storage($this->clientRepository, $this->accessTokenRepository, $this->scopeRepository, $this->refreshTokenRepository);
     }
 
     public function resourceProcessor(Request $request, AccessToken $accessToken)
@@ -100,6 +148,7 @@ class FeatureContext extends BehatContext
 
     public function request($method, $uri)
     {
+        $this->client->setServer($this->getServer());
         $this->getApiContext()->request($method, $uri);
     }
 
@@ -122,6 +171,55 @@ class FeatureContext extends BehatContext
         }
 
         throw new \Exception(sprintf('The client "%s" does not exist.', $name));
+    }
+
+    /**
+     * @Given /^the server has the direct grant type processor$/
+     */
+    public function theServerHasTheDirectGrantTypeProcessor()
+    {
+        $builder = $this->getServerBuilder();
+        $processor = new DirectTokenGrantTypeProcessor($builder->getScopesObtainer(), $builder->getTokenCreator());
+
+        $builder->addTokenGrantTypeProcessor('direct', $processor);
+    }
+
+    /**
+     * @When /^I try to grant a token with the client "([^"]*)" and the user id "([^"]*)" and no scope$/
+     */
+    public function iTryToGrantATokenWithTheClientAndTheUserIdAndNoScope($clientName, $userId)
+    {
+        $this->iTryToGrantATokenWithTheClientAndTheUserIdAndTheScope($clientName, $userId, null);
+    }
+
+    /**
+     * @When /^I try to grant a token with the client "([^"]*)" and the user id "([^"]*)" and the scope "([^"]*)"$/
+     */
+    public function iTryToGrantATokenWithTheClientAndTheUserIdAndTheScope($clientName, $userId, $scope)
+    {
+        $client = $this->findClientByName($clientName);
+        $this->iAddTheHttpBasicAuthenticationHeaderWithAnd(f\get($client, 'id'), f\get($client, 'secret'));
+
+        $inputData = ['grant_type' => 'direct', 'user_id' => $userId];
+        if (f\not(is_null($scope))) {
+            $inputData = f\assoc($inputData, 'scope', $scope);
+        }
+
+        f\each(function ($v, $k) {
+            $this->getApiContext()->addRequestParameter($k, $v);
+        }, $inputData);
+
+        $this->iMakeAOauthTokenRequest();
+    }
+
+    /**
+     * @Given /^there are scopes:$/
+     */
+    public function thereAreScopes(TableNode $table)
+    {
+        foreach ($table->getRows() as $row) {
+            $this->scopeRepository->add(new Scope($row[0]));
+        }
     }
 
     /**
@@ -240,7 +338,7 @@ class FeatureContext extends BehatContext
      */
     public function iMakeAOauthTokenRequest()
     {
-        $this->getApiContext()->request('POST', '/oauth/token');
+        $this->request('POST', '/oauth/token');
     }
 
     /**
@@ -248,7 +346,7 @@ class FeatureContext extends BehatContext
      */
     public function iMakeAResourceRequest()
     {
-        $this->getApiContext()->request('GET', '/resource');
+        $this->request('GET', '/resource');
     }
 
     /**

@@ -44,6 +44,11 @@ class Client implements \IteratorAggregate
 
     public function hasAllowedGrantType($grantType)
     {
-        return f\contains(f\get($this, 'allowedGrantTypes'), $grantType);
+        return array_search($grantType, f\get($this, 'allowedGrantTypes')) !== false;
+    }
+
+    public function hasAllowedScope($scope)
+    {
+        return array_search($scope, f\get($this, 'allowedScopes')) !== false;
     }
 }

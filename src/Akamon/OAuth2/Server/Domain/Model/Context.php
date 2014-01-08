@@ -3,18 +3,19 @@
 namespace Akamon\OAuth2\Server\Domain\Model;
 
 use Akamon\OAuth2\Server\Domain\Model\Client\Client;
+use Akamon\OAuth2\Server\Domain\Model\Scope\ScopeCollection;
 
 class Context
 {
     private $client;
     private $userId;
-    private $scope;
+    private $scopes;
 
-    public function __construct(Client $client, $userId, $scope)
+    public function __construct(Client $client, $userId, ScopeCollection $scopes)
     {
         $this->client = $client;
         $this->userId = $userId;
-        $this->scope = $scope;
+        $this->scopes = $scopes;
     }
 
     public function getClient()
@@ -27,8 +28,8 @@ class Context
         return $this->userId;
     }
 
-    public function getScope()
+    public function getScopes()
     {
-        return $this->scope;
+        return $this->scopes;
     }
 }

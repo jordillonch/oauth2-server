@@ -3,6 +3,7 @@
 namespace Akamon\OAuth2\Server\Domain\Tests\Service\Token\TokenGrantTypeProcessor;
 
 use Akamon\OAuth2\Server\Domain\Model\Context;
+use Akamon\OAuth2\Server\Domain\Model\Scope\ScopeCollection;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\RefreshTokenGrantTypeProcessor;
 use Akamon\OAuth2\Server\Domain\Tests\OAuth2TestCase;
 use Mockery\MockInterface;
@@ -29,11 +30,6 @@ class RefreshTokenGrantTypeProcessorTest extends OAuth2TestCase
         $this->processor = new RefreshTokenGrantTypeProcessor($this->refreshTokenRepository, $this->accessTokenRepository, $this->tokenCreator);
     }
 
-    public function testGrantType()
-    {
-        $this->assertSame('refresh_token', $this->processor->getGrantType());
-    }
-
     public function testOk()
     {
         $client = $this->createClient();
@@ -41,7 +37,7 @@ class RefreshTokenGrantTypeProcessorTest extends OAuth2TestCase
         $accessToken = $this->createAccessToken();
         $refreshToken = $this->createRefreshToken(['accessTokenToken' => f\get($accessToken, 'token')]);
 
-        $context = new Context($client, f\get($accessToken, 'userId'), f\get($accessToken, 'scope'));
+        $context = new Context($client, f\get($accessToken, 'userId'), ScopeCollection::createFromString(f\get($accessToken, 'scope')));
 
         $params = new \stdClass();
 

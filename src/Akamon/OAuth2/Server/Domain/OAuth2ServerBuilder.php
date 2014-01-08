@@ -4,7 +4,10 @@ namespace Akamon\OAuth2\Server\Domain;
 
 use Akamon\OAuth2\Server\Domain\Controller\ResourceController;
 use Akamon\OAuth2\Server\Domain\Controller\TokenController;
-use Akamon\OAuth2\Server\Domain\OAuth2Server;
+use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\ComposedContextResolver;
+use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\DefaultClientScopeContextResolver;
+use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\ScopeAllowedContextResolver;
+use Akamon\OAuth2\Server\Domain\Service\Context\ContextResolver\ScopeExistenceContextResolver;
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenCreator\AccessTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenCreator\PersistentAccessTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Client\ClientCredentialsObtainer\HttpBasicClientCredentialsObtainer;
@@ -12,11 +15,12 @@ use Akamon\OAuth2\Server\Domain\Service\Client\ClientObtainer\AuthenticatedClien
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenDataObtainer\BearerAccessTokenDataObtainer;
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenObtainer\AccessTokenObtainer;
 use Akamon\OAuth2\Server\Domain\Service\Token\RandomGenerator\ArrayRandRandomGenerator;
-use Akamon\OAuth2\Server\Domain\Service\Scope\ScopeObtainer\ScopeObtainer;
+use Akamon\OAuth2\Server\Domain\Service\Scope\ScopesObtainer\ScopesObtainer;
 use Akamon\OAuth2\Server\Domain\Service\Token\RefreshTokenCreator\PersistentRefreshTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\RefreshTokenCreator\RefreshTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\RequestAccessTokenObtainer\RequestAccessTokenObtainer;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\RefreshingTokenCreator;
+use Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\ContextResolvedTokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\TokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGenerator\BearerTokenGenerator;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGranter\TokenGranterByGrantType;
@@ -25,7 +29,6 @@ use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\RefreshTok
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface;
 use Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface;
 use Akamon\OAuth2\Server\Domain\Service\User\UserIdObtainer\UserIdObtainerInterface;
-use Akamon\OAuth2\Server\Domain\Storage;
 use felpado as f;
 
 class OAuth2ServerBuilder
@@ -35,7 +38,7 @@ class OAuth2ServerBuilder
     private $lifetime;
     private $resourceProcessor;
 
-    private $scopeObtainer;
+    private $scopesObtainer;
     private $tokenGenerator;
 
     private $clientObtainer;
@@ -54,11 +57,21 @@ class OAuth2ServerBuilder
         $this->lifetime = $params['lifetime'];
         $this->resourceProcessor = $params['resource_processor'];
 
-        $this->scopeObtainer = new ScopeObtainer();
+        $this->scopesObtainer = new ScopesObtainer();
         $this->tokenGenerator = new BearerTokenGenerator(new ArrayRandRandomGenerator());
 
         $this->clientObtainer = $this->createClientObtainer();
         $this->tokenCreator = $this->createTokenCreator();
+    }
+
+    public function getScopesObtainer()
+    {
+        return $this->scopesObtainer;
+    }
+
+    public function getTokenCreator()
+    {
+        return $this->tokenCreator;
     }
 
     private function createClientObtainer()
@@ -71,11 +84,12 @@ class OAuth2ServerBuilder
     private function createTokenCreator()
     {
         $accessTokenCreator = $this->createAccessTokenCreator();
-        $creator = new TokenCreator($accessTokenCreator);
+        $accessingCreator = new TokenCreator($accessTokenCreator);
 
         $refreshTokenCreator = $this->createRefreshTokenCreator();
+        $refreshingCreator = new RefreshingTokenCreator($accessingCreator, $refreshTokenCreator);
 
-        return new RefreshingTokenCreator($creator, $refreshTokenCreator);
+        return new ContextResolvedTokenCreator($refreshingCreator, $this->createContextResolver());
     }
 
     private function createAccessTokenCreator()
@@ -98,23 +112,41 @@ class OAuth2ServerBuilder
         return new PersistentRefreshTokenCreator($creator, $repository);
     }
 
+    private function createContextResolver()
+    {
+        return new ComposedContextResolver([
+            new DefaultClientScopeContextResolver(),
+            new ScopeExistenceContextResolver($this->storage->getScopeRepository()),
+            new ScopeAllowedContextResolver()
+        ]);
+    }
+
+    public function addTokenGrantTypeProcessor($name, TokenGrantTypeProcessorInterface $processor)
+    {
+        if (f\contains($this->tokenGrantTypeProcessors, $name)) {
+            throw new \InvalidArgumentException(sprintf('The token grant type processor "%s" already exists.', $name));
+        }
+
+        $this->tokenGrantTypeProcessors[$name] = $processor;
+    }
+
+    public function getTokenGrantTypeProcessors()
+    {
+        return $this->tokenGrantTypeProcessors;
+    }
+
     public function addResourceOwnerPasswordCredentialsGrantType(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer)
     {
-        $processor = new PasswordTokenGrantTypeProcessor($userCredentialsChecker, $userIdObtainer, $this->scopeObtainer, $this->tokenCreator);
+        $processor = new PasswordTokenGrantTypeProcessor($userCredentialsChecker, $userIdObtainer, $this->scopesObtainer, $this->tokenCreator);
 
-        $this->addTokenGrantTypeProcessor($processor);
+        $this->addTokenGrantTypeProcessor('password', $processor);
     }
 
     public function addRefreshTokenGrantType()
     {
         $processor = new RefreshTokenGrantTypeProcessor($this->storage->getRefreshTokenRepository(), $this->storage->getAccessTokenRepository(), $this->tokenCreator);
 
-        $this->addTokenGrantTypeProcessor($processor);
-    }
-
-    private function addTokenGrantTypeProcessor(TokenGrantTypeProcessorInterface $processor)
-    {
-        $this->tokenGrantTypeProcessors[] = $processor;
+        $this->addTokenGrantTypeProcessor('refresh_token', $processor);
     }
 
     public function build()

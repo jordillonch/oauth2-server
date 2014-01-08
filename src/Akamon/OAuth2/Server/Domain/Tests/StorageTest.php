@@ -6,16 +6,44 @@ use Akamon\OAuth2\Server\Domain\Storage;
 
 class StorageTest extends OAuth2TestCase
 {
-    public function testStorage()
+    private $clientRepository;
+    private $accessTokenRepository;
+    private $scopeRepository;
+    private $refreshTokenRepository;
+
+    protected function setUp()
     {
-        $clientRepository = $this->mock('Akamon\OAuth2\Server\Domain\Model\Client\ClientRepositoryInterface');
-        $accessTokenRepository = $this->mock('Akamon\OAuth2\Server\Domain\Model\AccessToken\AccessTokenRepositoryInterface');
-        $refreshTokenRepository = $this->mock('Akamon\OAuth2\Server\Domain\Model\RefreshToken\RefreshTokenRepositoryInterface');
+        $this->clientRepository = $this->mock('Akamon\OAuth2\Server\Domain\Model\Client\ClientRepositoryInterface');
+        $this->accessTokenRepository = $this->mock('Akamon\OAuth2\Server\Domain\Model\AccessToken\AccessTokenRepositoryInterface');
+        $this->scopeRepository = $this->mock('Akamon\OAuth2\Server\Domain\Model\Scope\ScopeRepositoryInterface');
+        $this->refreshTokenRepository = $this->mock('Akamon\OAuth2\Server\Domain\Model\RefreshToken\RefreshTokenRepositoryInterface');
+    }
 
-        $storage = new Storage($clientRepository, $accessTokenRepository, $refreshTokenRepository);
+    public function testConstructionMin()
+    {
+        $storage = new Storage($this->clientRepository, $this->accessTokenRepository, $this->scopeRepository);
 
-        $this->assertSame($clientRepository, $storage->getClientRepository());
-        $this->assertSame($accessTokenRepository, $storage->getAccessTokenRepository());
-        $this->assertSame($refreshTokenRepository, $storage->getRefreshTokenRepository());
+        $this->assertSame($this->clientRepository, $storage->getClientRepository());
+        $this->assertSame($this->accessTokenRepository, $storage->getAccessTokenRepository());
+        $this->assertSame($this->scopeRepository, $storage->getScopeRepository());
+    }
+
+    public function testConstructionFull()
+    {
+        $storage = new Storage($this->clientRepository, $this->accessTokenRepository, $this->scopeRepository, $this->refreshTokenRepository);
+
+        $this->assertSame($this->clientRepository, $storage->getClientRepository());
+        $this->assertSame($this->accessTokenRepository, $storage->getAccessTokenRepository());
+        $this->assertSame($this->scopeRepository, $storage->getScopeRepository());
+        $this->assertSame($this->refreshTokenRepository, $storage->getRefreshTokenRepository());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetRefreshTokenRepositoryThrowsAnExceptionIfThereIsNoRefreshTokenRepository()
+    {
+        $storage = new Storage($this->clientRepository, $this->accessTokenRepository, $this->scopeRepository);
+        $storage->getRefreshTokenRepository();
     }
 }

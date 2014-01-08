@@ -3,6 +3,8 @@
 namespace Akamon\OAuth2\Server\Domain\Tests\Service\Token\AccessTokenCreator;
 
 use Akamon\OAuth2\Server\Domain\Model\Context;
+use Akamon\OAuth2\Server\Domain\Model\Scope\Scope;
+use Akamon\OAuth2\Server\Domain\Model\Scope\ScopeCollection;
 use Akamon\OAuth2\Server\Domain\Service\Token\AccessTokenCreator\AccessTokenCreator;
 use Akamon\OAuth2\Server\Domain\Model\Client\Client;
 use Mockery\MockInterface;
@@ -34,9 +36,9 @@ class AccessTokenCreatorTest extends \PHPUnit_Framework_TestCase
 
         $client = new Client(['id' => 'ups', 'name' => 'pablodip']);
         $userId = 'bar';
-        $scope = 'scope';
+        $scopes = new ScopeCollection([new Scope('foo'), new Scope('bar')]);
 
-        $context = new Context($client, $userId, $scope);
+        $context = new Context($client, $userId, $scopes);
         $accessToken = $this->creator->create($context);
 
         $this->assertInstanceOf('Akamon\OAuth2\Server\Domain\Model\AccessToken\AccessToken', $accessToken);
@@ -47,7 +49,7 @@ class AccessTokenCreatorTest extends \PHPUnit_Framework_TestCase
             'userId' => $userId,
             'createdAt' => time(),
             'lifetime' => $this->lifetime,
-            'scope' => $scope
+            'scope' => 'foo bar'
         ), $accessToken->getParams());
     }
 }

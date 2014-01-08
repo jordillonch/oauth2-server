@@ -2,8 +2,8 @@ Feature: OAuth Token Grant Password
 
   Background:
     Given there are clients:
-        | name     | secret | allowedGrantTypes |
-        | pablodip | abc    | ["password"]      |
+      | name     | secret | allowedGrantTypes |
+      | pablodip | abc    | ["password"]      |
     And there is a user "foo" with password "bar"
 
   Scenario: Invalid client credentials (invalid id)
@@ -54,7 +54,7 @@ Feature: OAuth Token Grant Password
         | foo      | no       |
         | no       | bar      |
 
-  Scenario: Access Token Granted
+  Scenario: Token Granted
     Given I add the http basic authentication for the client "pablodip" and "abc"
     When I add the request parameters:
         | grant_type | password   |
@@ -67,3 +67,4 @@ Feature: OAuth Token Grant Password
     And the response parameter "token_type" should be "bearer"
     And the response parameter "refresh_token" should exist
     And the response parameter "expires_in" should be "3600"
+    And the response parameter "scope" should be ""

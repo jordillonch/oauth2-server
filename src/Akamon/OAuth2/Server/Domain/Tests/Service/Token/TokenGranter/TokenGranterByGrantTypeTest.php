@@ -24,19 +24,20 @@ class TokenGranterByGrantTypeTest extends OAuth2TestCase
     {
         $this->clientObtainer = $this->mock('Akamon\OAuth2\Server\Domain\Service\Client\ClientObtainer\ClientObtainerInterface');
 
-        $this->processorCode = $this->createProcessorMock('code');
-        $this->processorPassword = $this->createProcessorMock('password');
-        $processors = [$this->processorCode, $this->processorPassword];
+        $this->processorCode = $this->createProcessorMock();
+        $this->processorPassword = $this->createProcessorMock();
+
+        $processors = [
+            'code' => $this->processorCode,
+            'password' => $this->processorPassword
+        ];
 
         $this->granter = new TokenGranterByGrantType($this->clientObtainer, $processors);
     }
 
-    private function createProcessorMock($grantType)
+    private function createProcessorMock()
     {
-        $processor = $this->mock('Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface');
-        $processor->shouldReceive('getGrantType')->andReturn($grantType);
-
-        return $processor;
+        return $this->mock('Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface');
     }
 
     public function testGrantOk()

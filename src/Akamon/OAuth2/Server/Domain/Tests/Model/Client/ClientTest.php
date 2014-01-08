@@ -57,4 +57,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($client->checkSecret('321'));
     }
+
+    public function testHasAllowedGrantType()
+    {
+        $client = new Client(['name' => 'pablodip', 'allowedGrantTypes' => ['foo']]);
+
+        $this->assertTrue($client->hasAllowedGrantType('foo'));
+        $this->assertFalse($client->hasAllowedGrantType('bar'));
+    }
+
+    public function testHasAllowedScope()
+    {
+        $client = new Client(['name' => 'pablodip', 'allowedScopes' => ['foo']]);
+
+        $this->assertTrue($client->hasAllowedScope('foo'));
+        $this->assertFalse($client->hasAllowedScope('bar'));
+    }
 }
