@@ -8,9 +8,10 @@ use Symfony\Component\HttpFoundation as Http;
 
 class OAuth2Client implements ClientInterface
 {
+    /** @var OAuth2Server */
     private $server;
 
-    public function __construct(OAuth2Server $server)
+    public function setServer(OAuth2Server $server)
     {
         $this->server = $server;
     }

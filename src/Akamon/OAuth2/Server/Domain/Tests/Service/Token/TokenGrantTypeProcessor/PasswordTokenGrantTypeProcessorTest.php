@@ -34,11 +34,6 @@ class PasswordTokenGrantTypeProcessorTest extends OAuth2TestCase
         $this->processor = new PasswordTokenGrantTypeProcessor($this->userCredentialsChecker, $this->userIdObtainer, $this->scopesObtainer, $this->tokenCreator);
     }
 
-    public function testGetGrantTypeShouldReturnPassword()
-    {
-        $this->assertSame('password', $this->processor->getGrantType());
-    }
-
     public function testProcessOk()
     {
         $client = $this->createClient();

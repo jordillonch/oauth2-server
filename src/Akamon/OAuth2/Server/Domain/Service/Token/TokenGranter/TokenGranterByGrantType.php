@@ -19,14 +19,14 @@ class TokenGranterByGrantType implements TokenGranterInterface
     {
         $this->clientObtainer = $clientObtainer;
 
-        foreach ($processors as $processor) {
-            $this->addProcessor($processor);
+        foreach ($processors as $name => $processor) {
+            $this->addProcessor($name, $processor);
         }
     }
 
-    private function addProcessor(TokenGrantTypeProcessorInterface $processor)
+    private function addProcessor($name, TokenGrantTypeProcessorInterface $processor)
     {
-        $this->processors[] = $processor;
+        $this->processors[$name] = $processor;
     }
 
     public function grant(Request $request)
@@ -57,10 +57,8 @@ class TokenGranterByGrantType implements TokenGranterInterface
      */
     private function findProcessor($grantType)
     {
-        foreach ($this->processors as $processor) {
-            if ($processor->getGrantType() === $grantType) {
-                return $processor;
-            }
+        if (f\contains($this->processors, $grantType)) {
+            return f\get($this->processors, $grantType);
         }
 
         throw new UnsupportedGrantTypeOAuthErrorException();

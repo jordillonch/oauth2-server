@@ -30,11 +30,6 @@ class RefreshTokenGrantTypeProcessorTest extends OAuth2TestCase
         $this->processor = new RefreshTokenGrantTypeProcessor($this->refreshTokenRepository, $this->accessTokenRepository, $this->tokenCreator);
     }
 
-    public function testGrantType()
-    {
-        $this->assertSame('refresh_token', $this->processor->getGrantType());
-    }
-
     public function testOk()
     {
         $client = $this->createClient();

@@ -38,7 +38,7 @@ class OAuth2ServerBuilder
     private $lifetime;
     private $resourceProcessor;
 
-    private $scopeObtainer;
+    private $scopesObtainer;
     private $tokenGenerator;
 
     private $clientObtainer;
@@ -57,11 +57,21 @@ class OAuth2ServerBuilder
         $this->lifetime = $params['lifetime'];
         $this->resourceProcessor = $params['resource_processor'];
 
-        $this->scopeObtainer = new ScopesObtainer();
+        $this->scopesObtainer = new ScopesObtainer();
         $this->tokenGenerator = new BearerTokenGenerator(new ArrayRandRandomGenerator());
 
         $this->clientObtainer = $this->createClientObtainer();
         $this->tokenCreator = $this->createTokenCreator();
+    }
+
+    public function getScopesObtainer()
+    {
+        return $this->scopesObtainer;
+    }
+
+    public function getTokenCreator()
+    {
+        return $this->tokenCreator;
     }
 
     private function createClientObtainer()
@@ -111,23 +121,32 @@ class OAuth2ServerBuilder
         ]);
     }
 
+    public function addTokenGrantTypeProcessor($name, TokenGrantTypeProcessorInterface $processor)
+    {
+        if (f\contains($this->tokenGrantTypeProcessors, $name)) {
+            throw new \InvalidArgumentException(sprintf('The token grant type processor "%s" already exists.', $name));
+        }
+
+        $this->tokenGrantTypeProcessors[$name] = $processor;
+    }
+
+    public function getTokenGrantTypeProcessors()
+    {
+        return $this->tokenGrantTypeProcessors;
+    }
+
     public function addResourceOwnerPasswordCredentialsGrantType(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer)
     {
-        $processor = new PasswordTokenGrantTypeProcessor($userCredentialsChecker, $userIdObtainer, $this->scopeObtainer, $this->tokenCreator);
+        $processor = new PasswordTokenGrantTypeProcessor($userCredentialsChecker, $userIdObtainer, $this->scopesObtainer, $this->tokenCreator);
 
-        $this->addTokenGrantTypeProcessor($processor);
+        $this->addTokenGrantTypeProcessor('password', $processor);
     }
 
     public function addRefreshTokenGrantType()
     {
         $processor = new RefreshTokenGrantTypeProcessor($this->storage->getRefreshTokenRepository(), $this->storage->getAccessTokenRepository(), $this->tokenCreator);
 
-        $this->addTokenGrantTypeProcessor($processor);
-    }
-
-    private function addTokenGrantTypeProcessor(TokenGrantTypeProcessorInterface $processor)
-    {
-        $this->tokenGrantTypeProcessors[] = $processor;
+        $this->addTokenGrantTypeProcessor('refresh_token', $processor);
     }
 
     public function build()

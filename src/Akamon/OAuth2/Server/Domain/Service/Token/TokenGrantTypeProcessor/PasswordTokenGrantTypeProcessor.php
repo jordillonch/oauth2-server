@@ -28,11 +28,6 @@ class PasswordTokenGrantTypeProcessor implements TokenGrantTypeProcessorInterfac
         $this->tokenCreator = $tokenCreator;
     }
 
-    public function getGrantType()
-    {
-        return 'password';
-    }
-
     public function process(Client $client, array $inputData)
     {
         $userCredentials = $this->getUserCredentialsFromInputData($inputData);

@@ -26,11 +26,6 @@ class RefreshTokenGrantTypeProcessor implements TokenGrantTypeProcessorInterface
         $this->tokenCreator = $tokenCreator;
     }
 
-    public function getGrantType()
-    {
-        return 'refresh_token';
-    }
-
     public function process(Client $client, array $inputData)
     {
         $context = $this->getContext($client, $inputData);
