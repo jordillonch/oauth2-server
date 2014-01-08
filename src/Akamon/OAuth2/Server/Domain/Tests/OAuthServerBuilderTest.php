@@ -29,7 +29,7 @@ class OAuth2ServerBuilderTest extends OAuth2TestCase
         $refreshTokenRepository = $this->mock('Akamon\OAuth2\Server\Domain\Model\RefreshToken\RefreshTokenRepositoryInterface');
         $scopeRepository = $this->mock('Akamon\OAuth2\Server\Domain\Model\Scope\ScopeRepositoryInterface');
 
-        return new Storage($clientRepository, $accessTokenRepository, $refreshTokenRepository, $scopeRepository);
+        return new Storage($clientRepository, $accessTokenRepository, $scopeRepository, $refreshTokenRepository);
     }
 
     public function testGetScopesObtainer()

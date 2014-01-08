@@ -117,7 +117,7 @@ class FeatureContext extends BehatContext
 
     private function createStorage()
     {
-        return new Storage($this->clientRepository, $this->accessTokenRepository, $this->refreshTokenRepository, $this->scopeRepository);
+        return new Storage($this->clientRepository, $this->accessTokenRepository, $this->scopeRepository, $this->refreshTokenRepository);
     }
 
     public function resourceProcessor(Request $request, AccessToken $accessToken)

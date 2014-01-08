@@ -11,15 +11,15 @@ class Storage
 {
     private $clientRepository;
     private $accessTokenRepository;
-    private $refreshTokenRepository;
     private $scopeRepository;
+    private $refreshTokenRepository;
 
-    public function __construct(ClientRepositoryInterface $clientRepository, AccessTokenRepositoryInterface $accessTokenRepository, RefreshTokenRepositoryInterface $refreshTokenRepository, ScopeRepositoryInterface $scopeRepository)
+    public function __construct(ClientRepositoryInterface $clientRepository, AccessTokenRepositoryInterface $accessTokenRepository, ScopeRepositoryInterface $scopeRepository, RefreshTokenRepositoryInterface $refreshTokenRepository = null)
     {
         $this->clientRepository = $clientRepository;
         $this->accessTokenRepository = $accessTokenRepository;
-        $this->refreshTokenRepository = $refreshTokenRepository;
         $this->scopeRepository = $scopeRepository;
+        $this->refreshTokenRepository = $refreshTokenRepository;
     }
 
     public function getClientRepository()
@@ -32,13 +32,17 @@ class Storage
         return $this->accessTokenRepository;
     }
 
-    public function getRefreshTokenRepository()
-    {
-        return $this->refreshTokenRepository;
-    }
-
     public function getScopeRepository()
     {
         return $this->scopeRepository;
+    }
+
+    public function getRefreshTokenRepository()
+    {
+        if (is_null($this->refreshTokenRepository)) {
+            throw new \RuntimeException('There is no refresh token repository.');
+        }
+
+        return $this->refreshTokenRepository;
     }
 }
