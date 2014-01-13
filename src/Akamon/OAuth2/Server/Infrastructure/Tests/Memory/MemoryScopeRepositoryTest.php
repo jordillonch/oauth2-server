@@ -11,4 +11,14 @@ class MemoryScopeRepositoryTest extends ScopeRepositoryTestCase
     {
         return new MemoryScopeRepository();
     }
+
+    public function testConstruction()
+    {
+        $scopes = ['foo', 'bar'];
+        $repo = new MemoryScopeRepository($scopes);
+
+        $this->assertNotNull($repo->find('foo'));
+        $this->assertNotNull($repo->find('bar'));
+        $this->assertNull($repo->find('ups'));
+    }
 }

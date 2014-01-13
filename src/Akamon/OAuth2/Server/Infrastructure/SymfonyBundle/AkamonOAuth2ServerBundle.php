@@ -3,12 +3,13 @@
 namespace Akamon\OAuth2\Server\Infrastructure\SymfonyBundle;
 
 use Akamon\OAuth2\Server\Infrastructure\SymfonyDependencyInjection\AkamonOAuth2ServerExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class AkamonOAuth2ServerBundle extends Bundle
 {
-    public function getContainerExtension()
+    public function build(ContainerBuilder $container)
     {
-        return new AkamonOAuth2ServerExtension();
+        $container->registerExtension(new AkamonOAuth2ServerExtension());
     }
 }

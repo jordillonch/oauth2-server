@@ -10,6 +10,12 @@ class MemoryScopeRepository implements ScopeRepositoryInterface
 {
     private $scopes = [];
 
+    public function __construct($scopes = array())
+    {
+        $createScope = function ($name) { return new Scope($name); };
+        f\each([$this, 'add'], f\map($createScope, $scopes));
+    }
+
     /**
      * @param Scope $scope
      *
