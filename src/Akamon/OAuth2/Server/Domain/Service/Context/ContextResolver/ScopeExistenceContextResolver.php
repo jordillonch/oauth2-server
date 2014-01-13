@@ -21,7 +21,7 @@ class ScopeExistenceContextResolver implements ContextResolverInterface
         $scopeExists = [$this->repository, 'find'];
         $scopeNames = $context->getScopes()->getNames();
 
-        if (f\some(f\not_callback($scopeExists), $scopeNames)) {
+        if (f\some(f\not_fn($scopeExists), $scopeNames)) {
             throw new ScopeNotFoundOAuthErrorException();
         }
 

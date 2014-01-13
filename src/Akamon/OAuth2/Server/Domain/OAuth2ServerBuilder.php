@@ -50,7 +50,7 @@ class OAuth2ServerBuilder
     {
         $this->storage = $storage;
 
-        f\validate_collection_or_throw($params, [
+        f\validate_coll_or_throw($params, [
             'lifetime' => f\required(['v' => 'is_int']),
             'resource_processor' => f\required(['v' => 'is_callable'])
         ]);

@@ -2,11 +2,14 @@
 
 namespace Akamon\OAuth2\Server\Behat;
 
-use Akamon\Behat\ApiContext\Client\ClientInterface;
+use Akamon\Behat\ApiContext\Domain\Model\Request;
+use Akamon\Behat\ApiContext\Domain\Service\ClientRequester\ClientRequesterInterface;
+use Akamon\Behat\ApiContext\Infrastructure\RequestConverter\SymfonyHttpFoundationRequestConverter;
+use Akamon\Behat\ApiContext\Infrastructure\ResponseConverter\SymfonyHttpFoundationResponseConverter;
 use Akamon\OAuth2\Server\Domain\OAuth2Server;
 use Symfony\Component\HttpFoundation as Http;
 
-class OAuth2Client implements ClientInterface
+class OAuth2Client implements ClientRequesterInterface
 {
     /** @var OAuth2Server */
     private $server;
@@ -19,18 +22,23 @@ class OAuth2Client implements ClientInterface
     /**
      * @return Http\Response
      */
-    public function request(Http\Request $request)
+    public function request(Request $request)
     {
-        $uri = $request->getPathInfo();
+        $uri = $request->getUri();
+
+        $requestConverter = new SymfonyHttpFoundationRequestConverter();
+        $symfonyRequest = $requestConverter->convert($request);
 
         if ($uri === '/oauth/token') {
-            return $this->server->token($request);
+            $response =  $this->server->token($symfonyRequest);
+        } else if ($uri === '/resource') {
+            $response = $this->server->resource($symfonyRequest);
+        } else {
+            throw new \Exception('Invalid request.');
         }
 
-        if ($uri === '/resource') {
-            return $this->server->resource($request);
-        }
+        $responseConverter = new SymfonyHttpFoundationResponseConverter();
 
-        throw new \Exception('Invalid request.');
+        return $responseConverter->convert($response);
     }
 }

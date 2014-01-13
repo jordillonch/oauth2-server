@@ -13,7 +13,7 @@ class ScopeAllowedContextResolver implements ContextResolverInterface
         $isScopeAllowed = [$context->getClient(), 'hasAllowedScope'];
         $scopeNames = $context->getScopes()->getNames();
 
-        if (f\some(f\not_callback($isScopeAllowed), $scopeNames)) {
+        if (f\some(f\not_fn($isScopeAllowed), $scopeNames)) {
             throw new UnauthorizedClientForScopeOAuthErrorException();
         }
 

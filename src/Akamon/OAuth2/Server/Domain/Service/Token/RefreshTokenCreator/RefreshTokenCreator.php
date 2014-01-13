@@ -16,7 +16,7 @@ class RefreshTokenCreator implements RefreshTokenCreatorInterface
     {
         $this->tokenGenerator = $tokenGenerator;
 
-        f\validate_collection($params, ['lifetime' => f\required(['v' => 'is_int'])]);
+        f\validate_coll_or_throw($params, ['lifetime' => f\required(['v' => 'is_int'])]);
         $this->lifetime = $params['lifetime'];
     }
 

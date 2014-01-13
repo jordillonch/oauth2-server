@@ -32,13 +32,18 @@
         <exec command="./vendor/bin/phpunit -c phpunit-coverage.xml" passthru="true"/>
     </target>
 
-    <target name="behat" description="Acceptance Tests">
+    <target name="behat-domain" description="Domain Acceptance Tests">
         <exec command="./vendor/bin/behat --format=progress" passthru="true"/>
+    </target>
+
+    <target name="behat-symfony-bundle" description="Symfony Bundle Acceptance Tests">
+        <exec command="./vendor/bin/behat --profile=symfony-bundle --format=progress" passthru="true"/>
     </target>
 
     <target name="tests" description="All Tests">
         <phingcall target="phpunit" />
-        <phingcall target="behat" />
+        <phingcall target="behat-domain" />
+        <phingcall target="behat-symfony-bundle" />
     </target>
 
 </project>

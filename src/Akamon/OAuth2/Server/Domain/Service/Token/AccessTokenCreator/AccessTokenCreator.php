@@ -17,7 +17,7 @@ class AccessTokenCreator implements AccessTokenCreatorInterface
     {
         $this->tokenGenerator = $tokenGenerator;
 
-        f\validate_collection($params, [
+        f\validate_coll_or_throw($params, [
             'type' => f\required(['v' => 'is_string']),
             'lifetime' => f\required(['v' => 'is_int'])
         ]);

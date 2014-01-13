@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="akamon.oauth2_server.token_lifetime"></parameter>
+
+        <parameter key="akamon.oauth2_server.storage.class">Akamon\OAuth2\Server\Storage</parameter>
+        <parameter key="akamon.oauth2_server.scope_repository.class">Akamon\OAuth2\Server\Infrastructure\Memory</parameter>
+        <parameter key="akamon.oauth2_server.server_builder.class">Akamon\OAuth2\Server\Domain\OAuth2ServerBuilder</parameter>
+    </parameters>
+
+    <services>
+        <service id="akamon.oauth2_server.client_repository" alias="">
+        </service>
+        <service id="akamon.oauth2_server.access_token_repository" alias="">
+        </service>
+        <service id="akamon.oauth2_server.scope_repository" class="%akamon.oauth2_server.scope_repository.class%">
+        </service>
+        <service id="akamon.oauth2_server.refresh_token_repository" class="Akamon\OAuth2\Server\Domain\Model\RefreshToken\RefreshTokenRepositoryInterface">
+        </service>
+
+        <service id="akamon.oauth2_server.storage" class="%akamon.oauth2_server.storage.class%">
+            <argument type="service" id="akamon.oauth2_server.client_repository" />
+            <argument type="service" id="akamon.oauth2_server.access_token_repository" />
+            <argument type="service" id="akamon.oauth2_server.scope_repository" />
+            <argument type="service" id="akamon.oauth2_server.refresh_token_repository" />
+        </service>
+
+        <service id="akamon.oauth2_server.server_builder" class="%akamon.oauth2_server.server_builder.class%">
+            <argument type="service" id="akamon.oauth2_server.storage" />
+        </service>
+
+        <service id="akamon.oauth2_server.server" class="Akamon\OAuth2\Server\Domain" factory-service="akamon.oauth2_server.server_builder" factory-method="build">
+        </service>
+
+        <service id="akamon.oauth2_server.command.client.create" class="Akamon\OAuth2\Server\Infrastructure\SymfonyConsole\CreateClientCommand">
+            <argument type="service" id="akamon.oauth2_server.client_repository" />
+            <tag name="console.command" />
+        </service>
+
+    </services>
+
+</container>

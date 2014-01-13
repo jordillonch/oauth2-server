@@ -2,6 +2,9 @@
 
 namespace Akamon\OAuth2\Server\Behat;
 
+use Akamon\Behat\ApiContext\Domain\ApiContext;
+use Akamon\Behat\ApiContext\Domain\Service\Parameter\ParameterAccessor\DeepArrayParameterAccessor;
+use Akamon\Behat\ApiContext\Domain\Service\ResponseParametersProcessor\JsonResponseParametersProcessor;
 use Akamon\OAuth2\Server\Domain\Model\AccessToken\AccessToken;
 use Akamon\OAuth2\Server\Domain\Model\Client\Client;
 use Akamon\OAuth2\Server\Domain\Model\RefreshToken\RefreshToken;
@@ -12,9 +15,6 @@ use Akamon\OAuth2\Server\Infrastructure\Memory\MemoryScopeRepository;
 use Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\IterableUserCredentialsChecker;
 use Akamon\OAuth2\Server\Domain\Service\User\UserIdObtainer\IterableUserIdObtainer;
 use Behat\Behat\Context\BehatContext;
-use Akamon\Behat\ApiContext\ApiContext;
-use Akamon\Behat\ApiContext\ParameterAccessor\DeepArrayParameterAccessor;
-use Akamon\Behat\ApiContext\ResponseParametersProcessor\JsonResponseParametersProcessor;
 use Akamon\OAuth2\Server\Infrastructure\DoctrineCache\DoctrineCacheAccessTokenRepository;
 use Akamon\OAuth2\Server\Infrastructure\Filesystem\FileClientRepository;
 use Akamon\OAuth2\Server\Infrastructure\DoctrineCache\DoctrineCacheRefreshTokenRepository;
@@ -133,7 +133,7 @@ class FeatureContext extends BehatContext
     {
         $apiContext = new ApiContext(
             $this->client,
-            new DeepArrayParameterAccessor('.'),
+            new DeepArrayParameterAccessor(['separator' => '.']),
             new JsonResponseParametersProcessor()
         );
 

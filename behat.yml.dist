@@ -1,5 +1,11 @@
 default:
-    paths:
-        features: features
-    context:
-        class: Akamon\OAuth2\Server\Behat\FeatureContext
+  paths:
+    features: features/domain
+  context:
+    class: Akamon\OAuth2\Server\Behat\FeatureContext
+
+symfony-bundle:
+  paths:
+    features: features/infrastructure/symfony_bundle
+  context:
+      class: Akamon\OAuth2\Server\Infrastructure\SymfonyBundle\Behat\FeatureContext
