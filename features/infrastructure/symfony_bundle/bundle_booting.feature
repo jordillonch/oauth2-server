@@ -1,4 +1,7 @@
-Feature: OAuth2ServerBundle
+Feature: AkamonOAuth2ServerBundle booting
+  In order to use the AkamonOAuth2ServerBundle
+  As a developer
+  I want to boot the bundle
 
   Scenario: Using alone with minimum config
     Given I have a symfony kernel

@@ -102,12 +102,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Akamon/behat-symfony-kernel-context.git",
-                "reference": "9bc835e3812cf5c2533f69eeddfb3e929bd71757"
+                "reference": "f028e7115772a8e3d8e4f810123d73535637c76b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Akamon/behat-symfony-kernel-context/zipball/9bc835e3812cf5c2533f69eeddfb3e929bd71757",
-                "reference": "9bc835e3812cf5c2533f69eeddfb3e929bd71757",
+                "url": "https://api.github.com/repos/Akamon/behat-symfony-kernel-context/zipball/f028e7115772a8e3d8e4f810123d73535637c76b",
+                "reference": "f028e7115772a8e3d8e4f810123d73535637c76b",
                 "shasum": ""
             },
             "require": {
@@ -116,10 +116,12 @@
                 "behat/behat": "~2.4",
                 "pablodip/felpado": "~0.8",
                 "php": ">=5.3.3",
+                "symfony/filesystem": "~2.3",
                 "symfony/http-kernel": "~2.0"
             },
             "require-dev": {
                 "mockery/mockery": "~0.8",
+                "phing/phing": "~2.6",
                 "phpunit/phpunit": "~3.7",
                 "symfony/symfony": "~2.4"
             },
@@ -147,7 +149,7 @@
                 "kernel",
                 "symfony"
             ],
-            "time": "2014-01-10 18:50:15"
+            "time": "2014-01-14 09:12:47"
         },
         {
             "name": "akamon/mockery-callable-mock",

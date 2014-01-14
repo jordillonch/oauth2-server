@@ -26,6 +26,7 @@ class StorageTest extends OAuth2TestCase
         $this->assertSame($this->clientRepository, $storage->getClientRepository());
         $this->assertSame($this->accessTokenRepository, $storage->getAccessTokenRepository());
         $this->assertSame($this->scopeRepository, $storage->getScopeRepository());
+        $this->assertFalse($storage->hasRefreshTokenRepository());
     }
 
     public function testConstructionFull()
@@ -36,6 +37,7 @@ class StorageTest extends OAuth2TestCase
         $this->assertSame($this->accessTokenRepository, $storage->getAccessTokenRepository());
         $this->assertSame($this->scopeRepository, $storage->getScopeRepository());
         $this->assertSame($this->refreshTokenRepository, $storage->getRefreshTokenRepository());
+        $this->assertTrue($storage->hasRefreshTokenRepository());
     }
 
     /**

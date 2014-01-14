@@ -37,6 +37,11 @@ class Storage
         return $this->scopeRepository;
     }
 
+    public function hasRefreshTokenRepository()
+    {
+        return !is_null($this->refreshTokenRepository);
+    }
+
     public function getRefreshTokenRepository()
     {
         if (is_null($this->refreshTokenRepository)) {

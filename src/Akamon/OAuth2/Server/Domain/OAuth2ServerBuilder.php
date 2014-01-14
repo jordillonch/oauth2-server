@@ -51,7 +51,7 @@ class OAuth2ServerBuilder
         $this->storage = $storage;
 
         f\validate_coll_or_throw($params, [
-            'lifetime' => f\required(['v' => 'is_int']),
+            'lifetime' => f\required(['v' => 'is_scalar']),
             'resource_processor' => f\required(['v' => 'is_callable'])
         ]);
         $this->lifetime = $params['lifetime'];
@@ -86,10 +86,7 @@ class OAuth2ServerBuilder
         $accessTokenCreator = $this->createAccessTokenCreator();
         $accessingCreator = new TokenCreator($accessTokenCreator);
 
-        $refreshTokenCreator = $this->createRefreshTokenCreator();
-        $refreshingCreator = new RefreshingTokenCreator($accessingCreator, $refreshTokenCreator);
-
-        return new ContextResolvedTokenCreator($refreshingCreator, $this->createContextResolver());
+        return new ContextResolvedTokenCreator($this->createRefreshingTokenCreator($accessingCreator), $this->createContextResolver());
     }
 
     private function createAccessTokenCreator()
@@ -100,6 +97,15 @@ class OAuth2ServerBuilder
         $accessTokenRepository = $this->storage->getAccessTokenRepository();
 
         return new PersistentAccessTokenCreator($creator, $accessTokenRepository);
+    }
+
+    private function createRefreshingTokenCreator($accessingCreator)
+    {
+        if (f\not($this->storage->hasRefreshTokenRepository())) {
+            return $accessingCreator;
+        }
+
+        return  new RefreshingTokenCreator($accessingCreator, $this->createRefreshTokenCreator());
     }
 
     private function createRefreshTokenCreator()
