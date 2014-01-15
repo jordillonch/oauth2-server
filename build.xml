@@ -36,6 +36,10 @@
         <exec command="./vendor/bin/behat --format=progress" passthru="true"/>
     </target>
 
+    <target name="behat-symfony-container-extension" description="Symfony Container Extension Acceptance Tests">
+        <exec command="./vendor/bin/behat --profile=symfony-container-extension --format=progress" passthru="true"/>
+    </target>
+
     <target name="behat-symfony-bundle" description="Symfony Bundle Acceptance Tests">
         <exec command="./vendor/bin/behat --profile=symfony-bundle --format=progress" passthru="true"/>
     </target>
@@ -43,6 +47,7 @@
     <target name="tests" description="All Tests">
         <phingcall target="phpunit" />
         <phingcall target="behat-domain" />
+        <phingcall target="behat-symfony-container-extension" />
         <phingcall target="behat-symfony-bundle" />
     </target>
 

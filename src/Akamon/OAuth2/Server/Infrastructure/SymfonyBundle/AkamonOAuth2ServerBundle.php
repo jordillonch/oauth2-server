@@ -2,7 +2,7 @@
 
 namespace Akamon\OAuth2\Server\Infrastructure\SymfonyBundle;
 
-use Akamon\OAuth2\Server\Infrastructure\SymfonyDependencyInjection\AkamonOAuth2ServerExtension;
+use Akamon\OAuth2\Server\Infrastructure\SymfonyContainerExtension\AkamonOAuth2ServerExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

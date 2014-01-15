@@ -8,7 +8,7 @@ Feature: AkamonOAuth2ServerBundle booting
     And I use the bundle "Akamon\OAuth2\Server\Infrastructure\SymfonyBundle\AkamonOAuth2ServerBundle"
     And I have the kernel yaml config:
       """
-      akamon_o_auth2_server:
+      akamon_oauth2_server:
         token_lifetime: 100
 
         repositories:
@@ -33,7 +33,7 @@ Feature: AkamonOAuth2ServerBundle booting
       framework:
         secret: foo
 
-      akamon_o_auth2_server:
+      akamon_oauth2_server:
         token_lifetime: 100
 
         repositories:

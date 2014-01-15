@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "158229de44d48ef0b0eb69f995e85af9",
+    "hash": "e6ea80b9ee72cfa34d92978b0314cbd0",
     "packages": [
         {
             "name": "pablodip/felpado",
@@ -1065,6 +1065,109 @@
             "time": "2013-04-01 12:13:17"
         },
         {
+            "name": "pablodip/symfony-container-behat-context",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pablodip/symfony-container-behat-context.git",
+                "reference": "4e929f5e30a672b8dae55789f64e50ccc49b4989"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pablodip/symfony-container-behat-context/zipball/4e929f5e30a672b8dae55789f64e50ccc49b4989",
+                "reference": "4e929f5e30a672b8dae55789f64e50ccc49b4989",
+                "shasum": ""
+            },
+            "require": {
+                "behat/behat": "~2.4",
+                "pablodip/felpado": "~0.8",
+                "pablodip/symfony-container-configurator": "*@dev",
+                "php": ">=5.3.3",
+                "symfony/dependency-injection": "~2.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.8",
+                "phing/phing": "~2.6",
+                "phpunit/phpunit": "~3.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Pablodip\\Behat\\SymfonyContainerContext\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pablo Díez",
+                    "email": "pablodip@gmail.com",
+                    "homepage": "http://github.com/pablodip"
+                }
+            ],
+            "description": "Behat context for the Symfony Container",
+            "keywords": [
+                "Behat",
+                "Context",
+                "container",
+                "dependency-injection",
+                "extensions",
+                "symfony"
+            ],
+            "time": "2014-01-15 09:23:09"
+        },
+        {
+            "name": "pablodip/symfony-container-configurator",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pablodip/symfony-container-configurator.git",
+                "reference": "3ad2d43ce71657c85648e329f16c1076cb9bd7cc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pablodip/symfony-container-configurator/zipball/3ad2d43ce71657c85648e329f16c1076cb9bd7cc",
+                "reference": "3ad2d43ce71657c85648e329f16c1076cb9bd7cc",
+                "shasum": ""
+            },
+            "require": {
+                "pablodip/felpado": "~0.8",
+                "php": ">=5.3.3",
+                "symfony/dependency-injection": "~2.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.8",
+                "phpunit/phpunit": "~3.7",
+                "symfony/config": "~2.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Pablodip\\Symfony\\ContainerConfigurator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pablo Díez",
+                    "email": "pablodip@gmail.com",
+                    "homepage": "http://github.com/pablodip"
+                }
+            ],
+            "description": "Configurators for the Symfony Container",
+            "keywords": [
+                "configurator",
+                "container",
+                "symfony"
+            ],
+            "time": "2014-01-15 09:34:00"
+        },
+        {
             "name": "phing/phing",
             "version": "2.6.1",
             "source": {
@@ -1362,16 +1465,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "3.7.28",
+            "version": "3.7.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "3b97c8492bcafbabe6b6fbd2ab35f2f04d932a8d"
+                "reference": "faeb2d9f15dc83830d2db5e4c67acf1d68c9b5ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3b97c8492bcafbabe6b6fbd2ab35f2f04d932a8d",
-                "reference": "3b97c8492bcafbabe6b6fbd2ab35f2f04d932a8d",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/faeb2d9f15dc83830d2db5e4c67acf1d68c9b5ac",
+                "reference": "faeb2d9f15dc83830d2db5e4c67acf1d68c9b5ac",
                 "shasum": ""
             },
             "require": {
@@ -1432,7 +1535,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2013-10-17 07:27:40"
+            "time": "2014-01-15 06:46:38"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -2428,7 +2531,9 @@
         "pablodip/felpado": 20,
         "akamon/behat-api-context": 20,
         "akamon/behat-symfony-kernel-context": 20,
+        "pablodip/symfony-container-behat-context": 20,
         "akamon/symfony-configurable-kernel": 20,
+        "pablodip/symfony-container-configurator": 20,
         "akamon/mockery-callable-mock": 20
     },
     "platform": {

@@ -9,3 +9,9 @@ symfony-bundle:
     features: features/infrastructure/symfony_bundle
   context:
       class: Akamon\OAuth2\Server\Infrastructure\SymfonyBundle\Behat\FeatureContext
+
+symfony-container-extension:
+  paths:
+    features: features/infrastructure/symfony_container_extension
+  context:
+      class: Akamon\OAuth2\Server\Infrastructure\SymfonyContainerExtension\Behat\FeatureContext

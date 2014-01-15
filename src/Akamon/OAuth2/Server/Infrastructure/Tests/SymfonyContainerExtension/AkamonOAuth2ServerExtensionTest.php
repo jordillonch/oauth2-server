@@ -1,9 +1,9 @@
 <?php
 
-namespace Akamon\OAuth2\Server\Infrastructure\Tests\SymfonyDependencyInjection;
+namespace Akamon\OAuth2\Server\Infrastructure\Tests\SymfonyContainerExtension;
 
 use Akamon\OAuth2\Server\Domain\Tests\OAuth2TestCase;
-use Akamon\OAuth2\Server\Infrastructure\SymfonyDependencyInjection\AkamonOAuth2ServerExtension;
+use Akamon\OAuth2\Server\Infrastructure\SymfonyContainerExtension\AkamonOAuth2ServerExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use felpado as f;
 

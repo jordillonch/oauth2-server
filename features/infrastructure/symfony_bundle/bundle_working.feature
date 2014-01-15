@@ -20,7 +20,7 @@ Feature: AkamonOAuth2ServerBundle working
         router:
           resource: "%kernel.root_dir%/routing.yml"
 
-      akamon_o_auth2_server:
+      akamon_oauth2_server:
         token_lifetime: 100
 
         repositories:

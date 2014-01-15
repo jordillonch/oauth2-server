@@ -1,6 +1,6 @@
 <?php
 
-namespace Akamon\OAuth2\Server\Infrastructure\SymfonyDependencyInjection;
+namespace Akamon\OAuth2\Server\Infrastructure\SymfonyContainerExtension;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
