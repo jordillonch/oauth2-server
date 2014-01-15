@@ -7,21 +7,21 @@ use Akamon\OAuth2\Server\Domain\Tests\Model\Client\ClientRepositoryTestCase;
 
 class FileClientRepositoryTest extends ClientRepositoryTestCase
 {
-    private $filename;
+    private $file;
 
     protected function createRepository()
     {
-        $this->filename = sys_get_temp_dir() . 'not-existent-folder/file-client-repository';
+        $this->file = sys_get_temp_dir() . '/not-existent-folder/file-client-repository';
 
-        return new FileClientRepository($this->filename);
+        return new FileClientRepository($this->file);
     }
 
     protected function tearDown()
     {
         parent::tearDown();
 
-        if (file_exists($this->filename)) {
-            unlink($this->filename);
+        if (file_exists($this->file)) {
+            unlink($this->file);
         }
     }
 }
