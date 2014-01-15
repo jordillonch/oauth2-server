@@ -23,29 +23,29 @@
     </target>
 
     <target name="phpunit" description="Unit Tests">
-        <exec command="./vendor/bin/phpunit" passthru="true"/>
+        <exec command="./vendor/bin/phpunit" passthru="true" checkreturn="true" />
     </target>
 
     <target name="phpunit-coverage-clover" description="Unit Tests with Clover Coverage">
-        <exec command="./vendor/bin/phpunit --coverage-clover=coverage.clover" passthru="true"/>
+        <exec command="./vendor/bin/phpunit --coverage-clover=coverage.clover" passthru="true" checkreturn="true" />
     </target>
 
     <target name="phpunit-coverage" description="Unit Tests with Coverage">
         <delete dir="build/coverage"/>
         <delete dir="build/logs/phpunit"/>
-        <exec command="./vendor/bin/phpunit -c phpunit-coverage.xml" passthru="true"/>
+        <exec command="./vendor/bin/phpunit -c phpunit-coverage.xml" passthru="true" checkreturn="true" />
     </target>
 
     <target name="behat-domain" description="Domain Acceptance Tests">
-        <exec command="./vendor/bin/behat --format=progress" passthru="true"/>
+        <exec command="./vendor/bin/behat --format=progress" passthru="true" checkreturn="true" />
     </target>
 
     <target name="behat-symfony-container-extension" description="Symfony Container Extension Acceptance Tests">
-        <exec command="./vendor/bin/behat --profile=symfony-container-extension --format=progress" passthru="true"/>
+        <exec command="./vendor/bin/behat --profile=symfony-container-extension --format=progress" passthru="true" checkreturn="true" />
     </target>
 
     <target name="behat-symfony-bundle" description="Symfony Bundle Acceptance Tests">
-        <exec command="./vendor/bin/behat --profile=symfony-bundle --format=progress" passthru="true"/>
+        <exec command="./vendor/bin/behat --profile=symfony-bundle --format=progress" passthru="true" checkreturn="true" />
     </target>
 
     <target name="tests" description="All Tests">
