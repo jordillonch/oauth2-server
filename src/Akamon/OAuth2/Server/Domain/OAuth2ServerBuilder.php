@@ -141,7 +141,7 @@ class OAuth2ServerBuilder
         return $this->tokenGrantTypeProcessors;
     }
 
-    public function addResourceOwnerPasswordCredentialsGrantType(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer)
+    public function addPasswordGrantType(UserCredentialsCheckerInterface $userCredentialsChecker, UserIdObtainerInterface $userIdObtainer)
     {
         $processor = new PasswordTokenGrantTypeProcessor($userCredentialsChecker, $userIdObtainer, $this->scopesObtainer, $this->tokenCreator);
 

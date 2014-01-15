@@ -109,7 +109,7 @@ class FeatureContext extends BehatContext
         $userCredentialsChecker = new IterableUserCredentialsChecker($this->users);
         $userIdObtainer = new IterableUserIdObtainer($this->users);
 
-        $builder->addResourceOwnerPasswordCredentialsGrantType($userCredentialsChecker, $userIdObtainer);
+        $builder->addPasswordGrantType($userCredentialsChecker, $userIdObtainer);
         $builder->addRefreshTokenGrantType();
 
         return $builder->build();

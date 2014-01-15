@@ -99,7 +99,7 @@ class OAuth2ServerBuilderTest extends OAuth2TestCase
         $userCredentialsChecker = $this->mock('Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\UserCredentialsCheckerInterface');
         $userIdObtainer = $this->mock('Akamon\OAuth2\Server\Domain\Service\User\UserIdObtainer\UserIdObtainerInterface');
 
-        $builder->addResourceOwnerPasswordCredentialsGrantType($userCredentialsChecker, $userIdObtainer);
+        $builder->addPasswordGrantType($userCredentialsChecker, $userIdObtainer);
 
         $server = $builder->build();
         $this->assertInstanceOf('Akamon\OAuth2\Server\Domain\OAuth2Server', $server);

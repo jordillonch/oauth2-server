@@ -27,6 +27,10 @@ Feature: AkamonOAuth2ServerBundle working
           client: oauth.client_repository
           access_token: oauth.access_token_repository
 
+        token_grant_type_processors:
+          direct:
+            id: oauth.direct_token_grant_type_processor
+
       services:
         oauth.client_repository:
           class: Akamon\OAuth2\Server\Infrastructure\Filesystem\FileClientRepository
@@ -38,6 +42,12 @@ Feature: AkamonOAuth2ServerBundle working
         oauth.access_token_repository.cache:
           class: Doctrine\Common\Cache\FilesystemCache
           arguments: [%kernel.root_dir%/oauth_access_tokens]
+
+        oauth.direct_token_grant_type_processor:
+          class: Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\DirectTokenGrantTypeProcessor
+          arguments:
+            - @akamon.oauth2_server.scopes_obtainer
+            - @akamon.oauth2_server.token_creator
       """
     And I boot the symfony kernel
     And I use the kernel
@@ -52,12 +62,16 @@ Feature: AkamonOAuth2ServerBundle working
     And the response parameter "error" should be "invalid_request"
     And the response parameter "message" should be "Client credentials are required."
 
-  Scenario: Requesting an access token with no grant types
+  Scenario: Granting access token
     When I add the http basic authentication for the oauth client "pablodip" and "abc"
     And I add the request parameters:
       | grant_type | direct |
+      | user_id    | foo    |
     And I make a "POST" request to "/oauth/token"
-    Then the response status code should be "400"
+    Then the response status code should be "200"
     And the response header "content-type" should be "application/json"
-    And the response parameter "error" should be "unsupported_grant_type"
-    And the response parameter "message" should be "The grant type is not supported."
+    And the response parameter "access_token" should exist
+    And the response parameter "token_type" should be "bearer"
+#    And the response parameter "refresh_token" should not exist
+    And the response parameter "expires_in" should be "100"
+    And the response parameter "scope" should be ""

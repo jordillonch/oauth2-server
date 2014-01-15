@@ -6,6 +6,7 @@ use Akamon\OAuth2\Server\Domain\Tests\OAuth2TestCase;
 use Akamon\OAuth2\Server\Infrastructure\SymfonyContainerExtension\AkamonOAuth2ServerExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use felpado as f;
+use Symfony\Component\DependencyInjection\Reference;
 
 class AkamonOAuth2ServerExtensionTest extends OAuth2TestCase
 {
@@ -28,6 +29,16 @@ class AkamonOAuth2ServerExtensionTest extends OAuth2TestCase
         $this->loadExtension($config);
 
         $this->assertSame(200, $this->container->getParameter('akamon.oauth2_server.token_lifetime'));
+    }
+
+    public function testLoadScopes()
+    {
+        $config = array_merge($this->minimumFakedConfig(), [
+            'scopes' => ['foo', 'bar', 'ups']
+        ]);
+        $this->loadExtension($config);
+
+        $this->assertSame($config['scopes'], $this->container->getParameter('akamon.oauth2_server.scopes'));
     }
 
     public function testLoadMinimumRepositories()
@@ -63,6 +74,22 @@ class AkamonOAuth2ServerExtensionTest extends OAuth2TestCase
         f\each(function ($service, $what) {
             $this->assertSame($service, (string) $this->container->getAlias(sprintf('akamon.oauth2_server.%s_repository', $what)));
         }, $config['repositories']);
+    }
+
+    public function testLoadTokenGrantTypeProcessor()
+    {
+        $config = array_merge($this->minimumFakedConfig(), [
+            'token_grant_type_processors' => [
+                'password' => [
+                    'id' => 'foo'
+                ]
+            ]
+        ]);
+        $this->loadExtension($config);
+
+        $def = $this->container->getDefinition('akamon.oauth2_server.server_builder');
+
+        $this->assertTrue($def->hasMethodCall('addTokenGrantTypeProcessor'));
     }
 
     private function loadExtension($config)

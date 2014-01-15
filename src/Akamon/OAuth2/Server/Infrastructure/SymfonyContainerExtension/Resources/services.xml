@@ -5,14 +5,16 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="akamon.oauth2_server.token_lifetime">20</parameter>
+        <parameter key="akamon.oauth2_server.token_lifetime">1</parameter>
+        <parameter key="akamon.oauth2_server.scopes" type="collection">
+        </parameter>
         <parameter key="akamon.oauth2_server_builder.params" type="collection">
             <parameter key="lifetime">%akamon.oauth2_server.token_lifetime%</parameter>
             <parameter key="resource_processor">array_merge</parameter>
         </parameter>
 
+        <parameter key="akamon.oauth2_server.scope_repository.memory.class">Akamon\OAuth2\Server\Infrastructure\Memory\MemoryScopeRepository</parameter>
         <parameter key="akamon.oauth2_server.storage.class">Akamon\OAuth2\Server\Domain\Storage</parameter>
-        <parameter key="akamon.oauth2_server.scope_repository.class">Akamon\OAuth2\Server\Infrastructure\Memory\MemoryScopeRepository</parameter>
         <parameter key="akamon.oauth2_server.server_builder.class">Akamon\OAuth2\Server\Domain\OAuth2ServerBuilder</parameter>
     </parameters>
 
@@ -21,10 +23,14 @@
         </service>
         <service id="akamon.oauth2_server.access_token_repository" alias="">
         </service>
-        <service id="akamon.oauth2_server.scope_repository" class="%akamon.oauth2_server.scope_repository.class%">
+        <service id="akamon.oauth2_server.scope_repository" alias="akamon.oauth2_server.scope_repository.memory">
         </service>
         <!--<service id="akamon.oauth2_server.refresh_token_repository" alias="" synthetic="true">-->
         <!--</service>-->
+
+        <service id="akamon.oauth2_server.scope_repository.memory" class="%akamon.oauth2_server.scope_repository.memory.class%">
+            <argument>%akamon.oauth2_server.scopes%</argument>
+        </service>
 
         <service id="akamon.oauth2_server.storage" class="%akamon.oauth2_server.storage.class%">
             <argument type="service" id="akamon.oauth2_server.client_repository" />
@@ -36,6 +42,11 @@
         <service id="akamon.oauth2_server.server_builder" class="%akamon.oauth2_server.server_builder.class%">
             <argument type="service" id="akamon.oauth2_server.storage" />
             <argument>%akamon.oauth2_server_builder.params%</argument>
+        </service>
+
+        <service id="akamon.oauth2_server.scopes_obtainer" class="Akamon\OAuth2\Server\Domain\Service\Scope\ScopesObtainer\ScopesObtainerInterface" factory-service="akamon.oauth2_server.server_builder" factory-method="getScopesObtainer">
+        </service>
+        <service id="akamon.oauth2_server.token_creator" class="Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\TokenCreatorInterface" factory-service="akamon.oauth2_server.server_builder" factory-method="getTokenCreator">
         </service>
 
         <service id="akamon.oauth2_server.server" class="Akamon\OAuth2\Server\Domain" factory-service="akamon.oauth2_server.server_builder" factory-method="build">

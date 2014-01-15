@@ -15,16 +15,28 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
 
-            ->scalarNode('token_lifetime')->isRequired()->end()
-
-            ->arrayNode('repositories')
-                ->children()
-                ->scalarNode('client')->isRequired()->end()
-                ->scalarNode('access_token')->isRequired()->end()
-                ->scalarNode('scope')->end()
-                ->scalarNode('refresh_token')->end()
+                ->scalarNode('token_lifetime')->isRequired()->end()
+                ->arrayNode('scopes')
+                    ->prototype('scalar')->end()
                 ->end()
-            ->end()
+
+                ->arrayNode('repositories')
+                    ->children()
+                        ->scalarNode('client')->isRequired()->end()
+                        ->scalarNode('access_token')->isRequired()->end()
+                        ->scalarNode('scope')->end()
+                        ->scalarNode('refresh_token')->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('token_grant_type_processors')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('id')->isRequired()->end()
+                        ->end()
+                    ->end()
+                ->end()
         ;
 
         return $treeBuilder;
