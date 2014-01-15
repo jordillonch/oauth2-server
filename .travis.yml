@@ -6,6 +6,7 @@ php:
   - hhvm
 
 before_script:
+  - composer self-update
   - composer --dev install
 
 script: ./vendor/bin/phing tests-travis
