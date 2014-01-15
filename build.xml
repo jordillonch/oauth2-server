@@ -26,6 +26,10 @@
         <exec command="./vendor/bin/phpunit" passthru="true"/>
     </target>
 
+    <target name="phpunit-coverage-clover" description="Unit Tests with Clover Coverage">
+        <exec command="./vendor/bin/phpunit --coverage-clover=coverage.clover" passthru="true"/>
+    </target>
+
     <target name="phpunit-coverage" description="Unit Tests with Coverage">
         <delete dir="build/coverage"/>
         <delete dir="build/logs/phpunit"/>
@@ -45,6 +49,13 @@
     </target>
 
     <target name="tests" description="All Tests">
+        <phingcall target="phpunit" />
+        <phingcall target="behat-domain" />
+        <phingcall target="behat-symfony-container-extension" />
+        <phingcall target="behat-symfony-bundle" />
+    </target>
+
+    <target name="tests-travis" description="All Tests for Travis">
         <phingcall target="phpunit" />
         <phingcall target="behat-domain" />
         <phingcall target="behat-symfony-container-extension" />
