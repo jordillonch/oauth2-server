@@ -7,16 +7,16 @@
     "packages": [
         {
             "name": "pablodip/felpado",
-            "version": "v0.8.0",
+            "version": "v0.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pablodip/felpado.git",
-                "reference": "5f354605dfd621c0a3608c34f83941764f0727f4"
+                "reference": "82bdb4d7351ee2981fad6047a145c9efa904a088"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pablodip/felpado/zipball/5f354605dfd621c0a3608c34f83941764f0727f4",
-                "reference": "5f354605dfd621c0a3608c34f83941764f0727f4",
+                "url": "https://api.github.com/repos/pablodip/felpado/zipball/82bdb4d7351ee2981fad6047a145c9efa904a088",
+                "reference": "82bdb4d7351ee2981fad6047a145c9efa904a088",
                 "shasum": ""
             },
             "require": {
@@ -48,7 +48,7 @@
                 "functional",
                 "programming"
             ],
-            "time": "2014-01-02 10:37:29"
+            "time": "2014-01-20 11:52:50"
         }
     ],
     "packages-dev": [
