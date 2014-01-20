@@ -6,11 +6,10 @@ use Akamon\Behat\ApiContext\Domain\ApiContext;
 use Akamon\Behat\ApiContext\Domain\Service\Parameter\ParameterAccessor\DeepArrayParameterAccessor;
 use Akamon\Behat\ApiContext\Domain\Service\ResponseParametersProcessor\JsonResponseParametersProcessor;
 use Akamon\OAuth2\Server\Domain\Model\AccessToken\AccessToken;
-use Akamon\OAuth2\Server\Domain\Model\Client\Client;
-use Akamon\OAuth2\Server\Domain\Model\RefreshToken\RefreshToken;
 use Akamon\OAuth2\Server\Domain\Model\Scope\Scope;
 use Akamon\OAuth2\Server\Domain\Model\Scope\ScopeRepositoryInterface;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\DirectTokenGrantTypeProcessor;
+use Akamon\OAuth2\Server\Infrastructure\Behat\OAuth2BehatContext;
 use Akamon\OAuth2\Server\Infrastructure\Memory\MemoryScopeRepository;
 use Akamon\OAuth2\Server\Domain\Service\User\UserCredentialsChecker\IterableUserCredentialsChecker;
 use Akamon\OAuth2\Server\Domain\Service\User\UserIdObtainer\IterableUserIdObtainer;
@@ -32,6 +31,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FeatureContext extends BehatContext
 {
+    private $apiContext;
+
     private $users;
 
     /** @var ClientRepositoryInterface */
@@ -43,6 +44,9 @@ class FeatureContext extends BehatContext
     /** @var ScopeRepositoryInterface */
     private $scopeRepository;
 
+    /** @var Storage */
+    private $storage;
+
     /** @var OAuth2ServerBuilder */
     private $serverBuilder;
     /** @var OAuth2Server */
@@ -53,11 +57,14 @@ class FeatureContext extends BehatContext
 
     public function __construct()
     {
+        $this->client = new OAuth2Client();
+        $this->apiContext = $this->createApiContext();
+        $this->useContext('api', $this->apiContext);
+
         $this->users = new \ArrayObject();
         $this->createRepositories();
-
-        $this->client = new OAuth2Client();
-        $this->useContext('api', $this->createApiContext());
+        $this->storage = $this->createStorage();
+        $this->useContext('oauth2', new OAuth2BehatContext($this->storage, $this->apiContext));
     }
 
     private function createRepositories()
@@ -66,6 +73,11 @@ class FeatureContext extends BehatContext
         $this->accessTokenRepository = new DoctrineCacheAccessTokenRepository(new ArrayCache());
         $this->refreshTokenRepository = new DoctrineCacheRefreshTokenRepository(new ArrayCache());
         $this->scopeRepository = new MemoryScopeRepository();
+    }
+
+    private function createStorage()
+    {
+        return new Storage($this->clientRepository, $this->accessTokenRepository, $this->scopeRepository, $this->refreshTokenRepository);
     }
 
     private function getServer()
@@ -113,11 +125,6 @@ class FeatureContext extends BehatContext
         $builder->addRefreshTokenGrantType();
 
         return $builder->build();
-    }
-
-    private function createStorage()
-    {
-        return new Storage($this->clientRepository, $this->accessTokenRepository, $this->scopeRepository, $this->refreshTokenRepository);
     }
 
     public function resourceProcessor(Request $request, AccessToken $accessToken)
@@ -198,7 +205,7 @@ class FeatureContext extends BehatContext
     public function iTryToGrantATokenWithTheClientAndTheUserIdAndTheScope($clientName, $userId, $scope)
     {
         $client = $this->findClientByName($clientName);
-        $this->iAddTheHttpBasicAuthenticationHeaderWithAnd(f\get($client, 'id'), f\get($client, 'secret'));
+        $this->apiContext->addHttpBasicAuthentication(f\get($client, 'id'), f\get($client, 'secret'));
 
         $inputData = ['grant_type' => 'direct', 'user_id' => $userId];
         if (f\not(is_null($scope))) {
@@ -223,22 +230,6 @@ class FeatureContext extends BehatContext
     }
 
     /**
-     * @Given /^there are clients:$/
-     */
-    public function thereAreOauthClients(TableNode $table)
-    {
-        $jsonDecode = function ($v) { return json_decode($v) ?: $v; };
-        $clients = f\map(f\partial('felpado\map', $jsonDecode), $table->getHash());
-
-        f\each([$this, 'createOAuthClient'], $clients);
-    }
-
-    public function createOAuthClient($params)
-    {
-        $this->clientRepository->add(new Client($params));
-    }
-
-    /**
      * @Given /^there is a user "([^"]*)" with password "([^"]*)"$/
      */
     public function thereIsAUserWithPassword($username, $password)
@@ -248,89 +239,6 @@ class FeatureContext extends BehatContext
             'username' => $username,
             'password' => $password
         ];
-    }
-
-    /**
-     * @Given /^I add the http basic authentication for the client "([^"]*)" and "([^"]*)"$/
-     */
-    public function iAddTheHttpBasicAuthenticationForTheOauthClientAnd($name, $secret)
-    {
-        $client = $this->findClientByName($name);
-
-        $this->iAddTheHttpBasicAuthenticationHeaderWithAnd(f\get($client, 'id'), $secret);
-    }
-
-    /**
-     * @Given /^there is an expired access token "([^"]*)"$/
-     */
-    public function thereIsAnExpiredAccessToken($token)
-    {
-        $accessToken = $this->createAccessToken([
-            'token' => $token,
-            'createdAt' => time() - 60,
-            'lifetime' => 59
-        ]);
-
-        $this->accessTokenRepository->add($accessToken);
-    }
-
-    /**
-     * @Given /^there is a valid access token "([^"]*)"$/
-     */
-    public function thereIsAValidAccessToken($token)
-    {
-        $accessToken = $this->createAccessToken(['token' => $token]);
-
-        $this->accessTokenRepository->add($accessToken);
-    }
-
-    private function createAccessToken(array $params = array())
-    {
-        return new AccessToken(array_replace([
-            'token' => sha1(microtime().mt_rand()),
-            'type' => 'bearer',
-            'clientId' => mt_rand(),
-            'userId' => mt_rand(),
-            'lifetime' => 3600
-        ], $params));
-    }
-
-    /**
-     * @Given /^there is a valid refresh token "([^"]*)" for the access token "([^"]*)"$/
-     */
-    public function thereIsAValidRefreshTokenForTheAccessToken($refreshTokenToken, $accessTokenToken)
-    {
-        $refreshToken = new RefreshToken([
-            'token' => $refreshTokenToken,
-            'accessTokenToken' => $accessTokenToken,
-            'createdAt' => time(),
-            'lifetime' => 3600
-        ]);
-
-        $this->refreshTokenRepository->add($refreshToken);
-    }
-
-    /**
-     * @Given /^there is an expired refresh token "([^"]*)" for the access token "([^"]*)"$/
-     */
-    public function thereIsAnExpiredRefreshTokenForTheAccessToken($refreshTokenToken, $accessTokenToken)
-    {
-        $refreshToken = new RefreshToken([
-            'token' => $refreshTokenToken,
-            'accessTokenToken' => $accessTokenToken,
-            'createdAt' => time() - 3601,
-            'lifetime' => 3600
-        ]);
-
-        $this->refreshTokenRepository->add($refreshToken);
-    }
-
-    /**
-     * @When /^I add the http basic authentication header with "([^"]*)" and "([^"]*)"$/
-     */
-    public function iAddTheHttpBasicAuthenticationHeaderWithAnd($username, $password)
-    {
-        $this->getApiContext()->addRequestHeader('AUTHORIZATION', 'Basic ' . base64_encode($username . ':' . $password));
     }
 
     /**
@@ -347,23 +255,5 @@ class FeatureContext extends BehatContext
     public function iMakeAResourceRequest()
     {
         $this->request('GET', '/resource');
-    }
-
-    /**
-     * @Then /^the oauth response format and cache are right$/
-     */
-    public function theOauthResponseFormatAndCacheAreRight()
-    {
-        $apiContext = $this->getApiContext();
-
-        $expectedHeaders = [
-            'content-type' => 'application/json',
-            'cache-control' => 'no-store, private',
-            'pragma' => 'no-cache'
-        ];
-
-        foreach ($expectedHeaders as $name => $value) {
-            $apiContext->checkResponseHeader($name, $value);
-        }
     }
 }

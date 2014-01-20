@@ -1,14 +1,14 @@
 Feature: OAuth Token
 
   Background:
-    Given there are clients:
+    Given there are oauth2 clients:
       | name     | secret | allowed_grant_types |
       | pablodip | abc    | ["password"]        |
 
   Scenario: Empty request
     When I make a token request
     Then the response status code should be "400"
-    And the oauth response format and cache are right
+    And the response should have the oauth2 right format and cache headers
     And the response parameter "error" should be "invalid_request"
     And the response parameter "message" should be "Client credentials are required."
 
@@ -17,23 +17,23 @@ Feature: OAuth Token
       | grant_type | password |
     And I make a token request
     Then the response status code should be "400"
-    And the oauth response format and cache are right
+    And the response should have the oauth2 right format and cache headers
     And the response parameter "error" should be "invalid_request"
     And the response parameter "message" should be "Client credentials are required."
 
   Scenario: Without grant type
-    Given I add the http basic authentication for the client "pablodip" and "abc"
+    Given I add the http basic authentication for the oauth2 client "pablodip" and "abc"
     And I make a token request
     Then the response status code should be "400"
-    And the oauth response format and cache are right
+    And the response should have the oauth2 right format and cache headers
     And the response parameter "error" should be "invalid_request"
     And the response parameter "message" should be "The grant type is required."
 
   Scenario: Unauthorized client
-    Given I add the http basic authentication for the client "pablodip" and "abc"
+    Given I add the http basic authentication for the oauth2 client "pablodip" and "abc"
     When I add the request parameter "grant_type" with "implicit"
     When I make a token request
     Then the response status code should be "400"
-    And the oauth response format and cache are right
+    And the response should have the oauth2 right format and cache headers
     And the response parameter "error" should be "unauthorized_client"
     And the response parameter "message" should be "The client is unauthorized for the grant type."

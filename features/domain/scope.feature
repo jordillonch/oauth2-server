@@ -7,14 +7,14 @@ Feature: Scope
       | read   |
       | write  |
       | delete |
-    And there are clients:
+    And there are oauth2 clients:
       | name     | secret | allowedGrantTypes | allowedScopes     | defaultScope |
       | pablodip | abc    | ["direct"]        | ["read", "write"] | read         |
 
   Scenario Outline: Invalid scope
     When I try to grant a token with the client "pablodip" and the user id "foo" and the scope "<scope>"
     Then the response status code should be "400"
-    And the oauth response format and cache are right
+    And the response should have the oauth2 right format and cache headers
     And the response parameter "error" should be "invalid_request"
     And the response parameter "message" should be "Invalid scope."
 
@@ -26,7 +26,7 @@ Feature: Scope
   Scenario Outline: Not allowed scope
     When I try to grant a token with the client "pablodip" and the user id "foo" and the scope "<scope>"
     Then the response status code should be "400"
-    And the oauth response format and cache are right
+    And the response should have the oauth2 right format and cache headers
     And the response parameter "error" should be "invalid_request"
     And the response parameter "message" should be "Scope not allowed."
 
@@ -39,7 +39,7 @@ Feature: Scope
   Scenario: Access Token Granted with client default scope
     When I try to grant a token with the client "pablodip" and the user id "foo" and no scope
     Then the response status code should be "200"
-    And the oauth response format and cache are right
+    And the response should have the oauth2 right format and cache headers
     And the response parameter "access_token" should exist
     And the response parameter "token_type" should be "bearer"
     And the response parameter "refresh_token" should exist
@@ -49,7 +49,7 @@ Feature: Scope
   Scenario Outline: Access Token Granted with custom scope
     When I try to grant a token with the client "pablodip" and the user id "foo" and the scope "<scope>"
     Then the response status code should be "200"
-    And the oauth response format and cache are right
+    And the response should have the oauth2 right format and cache headers
     And the response parameter "access_token" should exist
     And the response parameter "token_type" should be "bearer"
     And the response parameter "refresh_token" should exist
