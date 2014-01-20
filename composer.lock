@@ -1070,12 +1070,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pablodip/symfony-container-behat-context.git",
-                "reference": "4e929f5e30a672b8dae55789f64e50ccc49b4989"
+                "reference": "e2cb488c1f2f8f211fb4c610924167ff2de89a78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pablodip/symfony-container-behat-context/zipball/4e929f5e30a672b8dae55789f64e50ccc49b4989",
-                "reference": "4e929f5e30a672b8dae55789f64e50ccc49b4989",
+                "url": "https://api.github.com/repos/pablodip/symfony-container-behat-context/zipball/e2cb488c1f2f8f211fb4c610924167ff2de89a78",
+                "reference": "e2cb488c1f2f8f211fb4c610924167ff2de89a78",
                 "shasum": ""
             },
             "require": {
@@ -1116,7 +1116,7 @@
                 "extensions",
                 "symfony"
             ],
-            "time": "2014-01-15 09:23:09"
+            "time": "2014-01-20 16:46:10"
         },
         {
             "name": "pablodip/symfony-container-configurator",
