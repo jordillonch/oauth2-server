@@ -9,15 +9,13 @@ use Symfony\Component\HttpFoundation\Request;
 class ResourceController
 {
     private $requestAccessTokenObtainer;
-    private $processor;
 
-    public function __construct(RequestAccessTokenObtainerInterface $requestAccessTokenObtainer, $processor)
+    public function __construct(RequestAccessTokenObtainerInterface $requestAccessTokenObtainer)
     {
         $this->requestAccessTokenObtainer = $requestAccessTokenObtainer;
-        $this->processor = $processor;
     }
 
-    public function execute(Request $request)
+    public function execute(Request $request, $processor)
     {
         try {
             $accessToken = $this->requestAccessTokenObtainer->obtain($request);
@@ -25,6 +23,6 @@ class ResourceController
             return Controller::createOAuthHttpResponse($e->getHttpStatusCode(), $e->getParameters(), $e->getHeaders());
         }
 
-        return call_user_func($this->processor, $request, $accessToken);
+        return call_user_func($processor, $request, $accessToken);
     }
 }

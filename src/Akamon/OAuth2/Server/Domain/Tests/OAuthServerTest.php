@@ -38,10 +38,11 @@ class OAuth2ServerTest extends OAuth2TestCase
     public function testResource()
     {
         $request = new Request();
+        $processor = new \stdClass();
         $response = new Response();
 
-        $this->resourceController->shouldReceive('execute')->with($request)->once()->andReturn($response);
+        $this->resourceController->shouldReceive('execute')->with($request, $processor)->once()->andReturn($response);
 
-        $this->assertSame($response, $this->server->resource($request));
+        $this->assertSame($response, $this->server->resource($request, $processor));
     }
 }

@@ -8,6 +8,7 @@ use Akamon\Behat\ApiContext\Infrastructure\RequestConverter\SymfonyHttpFoundatio
 use Akamon\Behat\ApiContext\Infrastructure\ResponseConverter\SymfonyHttpFoundationResponseConverter;
 use Akamon\OAuth2\Server\Domain\OAuth2Server;
 use Symfony\Component\HttpFoundation as Http;
+use Symfony\Component\HttpFoundation\Response;
 
 class OAuth2Client implements ClientRequesterInterface
 {
@@ -32,7 +33,13 @@ class OAuth2Client implements ClientRequesterInterface
         if ($uri === '/oauth/token') {
             $response =  $this->server->token($symfonyRequest);
         } else if ($uri === '/resource') {
-            $response = $this->server->resource($symfonyRequest);
+            $response = $this->server->resource($symfonyRequest, function () {
+                $response = new Response();
+                $response->headers->set('content-type', 'text/plain');
+                $response->setContent('My resource!');
+
+                return $response;
+            });
         } else {
             throw new \Exception('Invalid request.');
         }

@@ -8,7 +8,7 @@ use Akamon\OAuth2\Server\Domain\Tests\OAuth2TestCase;
 use Mockery\MockInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class ResourceControllerControllerTest extends OAuth2TestCase
+class ResourceControllerTest extends OAuth2TestCase
 {
     /** @var MockInterface */
     private $requestAccessTokenObtainer;
@@ -42,9 +42,9 @@ class ResourceControllerControllerTest extends OAuth2TestCase
             return $response;
         };
 
-        $this->controller = new ResourceController($this->requestAccessTokenObtainer, $processor);
+        $this->controller = new ResourceController($this->requestAccessTokenObtainer);
 
-        $this->assertSame($response, $this->controller->execute($request));
+        $this->assertSame($response, $this->controller->execute($request, $processor));
         $this->assertSame([[$request, $accessToken]], $calls);
     }
 
@@ -60,9 +60,9 @@ class ResourceControllerControllerTest extends OAuth2TestCase
             $calls[] = func_get_args();
         };
 
-        $this->controller = new ResourceController($this->requestAccessTokenObtainer, $processor);
+        $this->controller = new ResourceController($this->requestAccessTokenObtainer);
 
-        $response = $this->controller->execute($request);
+        $response = $this->controller->execute($request, $processor);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $this->assertSame(400, $response->getStatusCode());
         $this->assertSame(json_encode($error->getParameters(), true), $response->getContent());

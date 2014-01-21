@@ -22,8 +22,8 @@ class OAuth2Server
         return $this->tokenController->execute($request);
     }
 
-    public function resource(Request $request)
+    public function resource(Request $request, $processor)
     {
-        return $this->resourceController->execute($request);
+        return $this->resourceController->execute($request, $processor);
     }
 }
