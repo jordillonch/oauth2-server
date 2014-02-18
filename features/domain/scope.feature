@@ -1,8 +1,7 @@
 Feature: Scope
 
   Background:
-    Given the server has the direct grant type processor
-    And there are scopes:
+    Given there are scopes:
       | all    |
       | read   |
       | write  |

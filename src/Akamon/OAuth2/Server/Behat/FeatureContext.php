@@ -124,6 +124,7 @@ class FeatureContext extends BehatContext
         $builder->addPasswordGrantType($userCredentialsChecker, $userIdObtainer);
         $builder->addClientCredentialsGrantType();
         $builder->addRefreshTokenGrantType();
+        $builder->addTokenGrantTypeProcessor('direct', new DirectTokenGrantTypeProcessor($builder->getScopesObtainer(), $builder->getTokenCreator()));
 
         return $builder->build();
     }
@@ -179,17 +180,6 @@ class FeatureContext extends BehatContext
         }
 
         throw new \Exception(sprintf('The client "%s" does not exist.', $name));
-    }
-
-    /**
-     * @Given /^the server has the direct grant type processor$/
-     */
-    public function theServerHasTheDirectGrantTypeProcessor()
-    {
-        $builder = $this->getServerBuilder();
-        $processor = new DirectTokenGrantTypeProcessor($builder->getScopesObtainer(), $builder->getTokenCreator());
-
-        $builder->addTokenGrantTypeProcessor('direct', $processor);
     }
 
     /**
