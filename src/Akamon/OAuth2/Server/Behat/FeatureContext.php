@@ -122,6 +122,7 @@ class FeatureContext extends BehatContext
         $userIdObtainer = new IterableUserIdObtainer($this->users);
 
         $builder->addPasswordGrantType($userCredentialsChecker, $userIdObtainer);
+        $builder->addClientCredentialsGrantType();
         $builder->addRefreshTokenGrantType();
 
         return $builder->build();

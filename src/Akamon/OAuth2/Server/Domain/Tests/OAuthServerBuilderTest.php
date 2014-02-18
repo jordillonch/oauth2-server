@@ -105,6 +105,16 @@ class OAuth2ServerBuilderTest extends OAuth2TestCase
         $this->assertInstanceOf('Akamon\OAuth2\Server\Domain\OAuth2Server', $server);
     }
 
+    public function testBuildWithClientCredentialsGrantType()
+    {
+        $builder = new OAuth2ServerBuilder($this->createFullStorage(), $this->createParams());
+
+        $builder->addClientCredentialsGrantType();
+
+        $server = $builder->build();
+        $this->assertInstanceOf('Akamon\OAuth2\Server\Domain\OAuth2Server', $server);
+    }
+
     public function testBuildWithRefreshTokenGrantType()
     {
         $builder = new OAuth2ServerBuilder($this->createFullStorage(), $this->createParams());

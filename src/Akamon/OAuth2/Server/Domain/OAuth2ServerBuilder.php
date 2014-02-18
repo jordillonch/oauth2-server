@@ -24,6 +24,7 @@ use Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\ContextResolvedTokenC
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenCreator\TokenCreator;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGenerator\BearerTokenGenerator;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGranter\TokenGranterByGrantType;
+use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\ClientCredentialsTokenGrantTypeProcessor;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\PasswordTokenGrantTypeProcessor;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\RefreshTokenGrantTypeProcessor;
 use Akamon\OAuth2\Server\Domain\Service\Token\TokenGrantTypeProcessor\TokenGrantTypeProcessorInterface;
@@ -146,6 +147,13 @@ class OAuth2ServerBuilder
         $processor = new PasswordTokenGrantTypeProcessor($userCredentialsChecker, $userIdObtainer, $this->scopesObtainer, $this->tokenCreator);
 
         $this->addTokenGrantTypeProcessor('password', $processor);
+    }
+
+    public function addClientCredentialsGrantType()
+    {
+        $processor = new ClientCredentialsTokenGrantTypeProcessor($this->scopesObtainer, $this->tokenCreator);
+
+        $this->addTokenGrantTypeProcessor('client_credentials', $processor);
     }
 
     public function addRefreshTokenGrantType()
