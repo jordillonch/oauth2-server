@@ -52,7 +52,7 @@ Feature: AkamonOAuth2ServerBundle working
     And I boot the symfony kernel
     And I use the kernel
     And there are oauth clients:
-      | name     | secret | allowedGrantTypes |
+      | id       | secret | allowedGrantTypes |
       | pablodip | abc    | ["direct"]        |
 
   Scenario: Requesting an access token with no data

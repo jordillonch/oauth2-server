@@ -10,7 +10,7 @@ class Client implements \IteratorAggregate
 
     public function __construct($params)
     {
-        $newParams = is_string($params) ? ['name' => $params] : $params;
+        $newParams = is_string($params) ? ['id' => $params] : $params;
 
         $this->params = f\fill_validating_or_throw($newParams, $this->getParamsRules());
     }
@@ -18,8 +18,7 @@ class Client implements \IteratorAggregate
     private function getParamsRules()
     {
         return [
-            'id' => f\optional(['v' => 'is_scalar']),
-            'name' => f\required(['v' => 'is_string']),
+            'id' => f\required(['v' => 'is_scalar']),
             'secret' => f\optional(['v' => 'is_scalar']),
             'allowedGrantTypes' => f\optional(['v' => 'is_array', 'd' => []]),
             'allowedScopes' => f\optional(['v' => 'is_array', 'd' => []]),

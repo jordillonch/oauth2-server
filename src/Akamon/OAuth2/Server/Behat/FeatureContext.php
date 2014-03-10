@@ -174,7 +174,7 @@ class FeatureContext extends BehatContext
         $clients = $this->clientRepository->findAll();
 
         foreach ($clients as $client) {
-            if (f\get($client, 'name') === $name) {
+            if (f\get($client, 'id') === $name) {
                 return $client;
             }
         }

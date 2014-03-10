@@ -25,7 +25,7 @@ abstract class ClientRepositoryTestCase extends \PHPUnit_Framework_TestCase
     public function testAddShouldSetAnIdToNewClients()
     {
         $newClient1 = new Client([
-            'name' => 'pablodip',
+            'id' => 'pablodip',
             'secret' => 'foo',
             'allowedGrantTypes' => ['password'],
             'allowedScopes' => ['read', 'write'],
@@ -70,7 +70,7 @@ abstract class ClientRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     public function testFindShouldReturnAClientById()
     {
-        $newClient1 = new Client(['name' => 'foo', 'allowedGrantTypes' => ['password']]);
+        $newClient1 = new Client(['id' => 'foo', 'allowedGrantTypes' => ['password']]);
         $newClient2 = new Client('bar');
 
         $addedClient1 = $this->repository->add($newClient1);

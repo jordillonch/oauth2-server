@@ -26,7 +26,7 @@ class CreateClientCommand extends Command
         $this
             ->setName('akamon:oauth2-server:client:create')
             ->setDescription('Creates a new client')
-            ->addArgument('name', InputArgument::REQUIRED)
+            ->addArgument('id', InputArgument::REQUIRED)
             ->addArgument('secret', InputArgument::OPTIONAL)
             ->addOption('allowed-grant-type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
             ->addOption('allowed-scope', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY)
@@ -36,7 +36,7 @@ class CreateClientCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $client = new Client([
-            'name' => $input->getArgument('name'),
+            'id' => $input->getArgument('id'),
             'secret' => $input->getArgument('secret'),
             'allowedGrantTypes' => $input->getOption('allowed-grant-type'),
             'allowedScopes' => $input->getOption('allowed-scope'),

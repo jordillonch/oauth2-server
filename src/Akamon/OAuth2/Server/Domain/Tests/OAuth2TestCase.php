@@ -10,7 +10,7 @@ class OAuth2TestCase extends \PHPUnit_Framework_TestCase
 {
     protected function createClient(array $params = array())
     {
-        return new Client(array_replace(['name' => 'client'.mt_rand()], $params));
+        return new Client(array_replace(['id' => 'client'.mt_rand()], $params));
     }
 
     protected function createAccessToken(array $params = array())

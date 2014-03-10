@@ -2,7 +2,7 @@ Feature: OAuth2 Client Credentials Grant Type
 
   Background:
     Given there are oauth2 clients:
-      | name     | secret | allowedGrantTypes      |
+      | id       | secret | allowedGrantTypes      |
       | pablodip | abc    | ["client_credentials"] |
 
   Scenario: Token Granted

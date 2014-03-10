@@ -11,17 +11,16 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $client = new Client('pablodip');
 
-        $this->assertSame('pablodip', f\get($client, 'name'));
+        $this->assertSame('pablodip', f\get($client, 'id'));
     }
 
     public function testConstructorMinimumParameters()
     {
-        $name = 'pablodip';
-        $client = new \Akamon\OAuth2\Server\Domain\Model\Client\Client(['name' => $name]);
+        $id = 'pablodip';
+        $client = new \Akamon\OAuth2\Server\Domain\Model\Client\Client(['id' => $id]);
 
         $this->assertSame([
-            'id' => null,
-            'name' => 'pablodip',
+            'id' => $id,
             'secret' => null,
             'allowedGrantTypes' => array(),
             'allowedScopes' => array(),
@@ -32,8 +31,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function testConstructorFullParameters()
     {
         $params = [
-            'id' => 1,
-            'name' => 'pablodip',
+            'id' => 'paolo',
             'secret' => 'foo',
             'allowedGrantTypes' => array('password'),
             'allowedScopes' => array('read'),
@@ -46,21 +44,21 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckSecretShouldReturnTrueWhenTheSecretIsRight()
     {
-        $client = new Client(['name' => 'pablodip', 'secret' => '123']);
+        $client = new Client(['id' => 'pablodip', 'secret' => '123']);
 
         $this->assertTrue($client->checkSecret('123'));
     }
 
     public function testCheckSecretShouldReturnFalseWhenTheSecretIsNotRight()
     {
-        $client = new Client(['name' => 'pablodip', 'secret' => '123']);
+        $client = new Client(['id' => 'pablodip', 'secret' => '123']);
 
         $this->assertFalse($client->checkSecret('321'));
     }
 
     public function testHasAllowedGrantType()
     {
-        $client = new Client(['name' => 'pablodip', 'allowedGrantTypes' => ['foo']]);
+        $client = new Client(['id' => 'pablodip', 'allowedGrantTypes' => ['foo']]);
 
         $this->assertTrue($client->hasAllowedGrantType('foo'));
         $this->assertFalse($client->hasAllowedGrantType('bar'));
@@ -68,7 +66,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testHasAllowedScope()
     {
-        $client = new Client(['name' => 'pablodip', 'allowedScopes' => ['foo']]);
+        $client = new Client(['id' => 'pablodip', 'allowedScopes' => ['foo']]);
 
         $this->assertTrue($client->hasAllowedScope('foo'));
         $this->assertFalse($client->hasAllowedScope('bar'));

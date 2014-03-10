@@ -22,13 +22,10 @@ class FileClientRepository implements ClientRepositoryInterface
     {
         $clients = $this->allFromFile();
 
-        $newId = max(f\conjoin(f\keys($clients), 0)) + 1;
-        $newClient = new Client(array_merge($client->getParams(), ['id' => $newId]));
-
-        $newClients = f\assoc($clients, $newId, $newClient->getParams());
+        $newClients = f\assoc($clients, f\get($client, 'id'), $client->getParams());
         $this->allToFile($newClients);
 
-        return $newClient;
+        return $client;
     }
 
     public function update(Client $client)

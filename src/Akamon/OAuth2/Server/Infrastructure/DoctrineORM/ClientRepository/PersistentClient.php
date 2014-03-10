@@ -5,7 +5,7 @@ namespace Akamon\OAuth2\Server\Infrastructure\DoctrineORM\ClientRepository;
 class PersistentClient
 {
     private $id;
-    private $name;
+    private $oauth2Id;
     private $secret;
     private $allowedGrantTypes;
     private $allowedScopes;

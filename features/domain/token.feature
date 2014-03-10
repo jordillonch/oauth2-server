@@ -2,7 +2,7 @@ Feature: OAuth Token
 
   Background:
     Given there are oauth2 clients:
-      | name     | secret | allowedGrantTypes |
+      | id       | secret | allowedGrantTypes |
       | pablodip | abc    | ["direct"]        |
 
   Scenario: Empty request

@@ -2,7 +2,7 @@ Feature: Refresh Token
 
   Background:
     Given there are oauth2 clients:
-      | name     | secret | allowedGrantTypes |
+      | id       | secret | allowedGrantTypes |
       | pablodip | abc    | ["refresh_token"] |
 
   Scenario: Without Refresh Token

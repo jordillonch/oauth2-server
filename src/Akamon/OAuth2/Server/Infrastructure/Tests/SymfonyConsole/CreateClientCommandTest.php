@@ -28,11 +28,11 @@ class CreateClientCommandTest extends OAuth2TestCase
     {
         $name = 'foo';
 
-        $client = new Client(['name' => $name]);
+        $client = new Client(['id' => $name]);
 
         $this->repository->shouldReceive('add')->with(\Mockery::on(function ($v) use ($client) { return $v == $client; }))->once();
 
-        $input = new ArrayInput(['name' => $name]);
+        $input = new ArrayInput(['id' => $name]);
         $this->assertSame(0, $this->command->run($input, new NullOutput()));
     }
 
@@ -45,7 +45,7 @@ class CreateClientCommandTest extends OAuth2TestCase
         $defaultScope = 'ups';
 
         $client = new Client([
-            'name' => $name,
+            'id' => $name,
             'secret' => $secret,
             'allowedGrantTypes' => $allowedGrantTypes,
             'allowedScopes' => $allowedScopes,
@@ -55,7 +55,7 @@ class CreateClientCommandTest extends OAuth2TestCase
         $this->repository->shouldReceive('add')->with(\Mockery::on(function ($v) use ($client) { return $v == $client; }))->once();
 
         $input = new ArrayInput([
-            'name' => $name,
+            'id' => $name,
             'secret' => $secret,
             '--allowed-grant-type' => $allowedGrantTypes,
             '--allowed-scope' => $allowedScopes,

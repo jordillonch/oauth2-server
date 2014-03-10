@@ -7,7 +7,7 @@ Feature: Scope
       | write  |
       | delete |
     And there are oauth2 clients:
-      | name     | secret | allowedGrantTypes | allowedScopes     | defaultScope |
+      | id       | secret | allowedGrantTypes | allowedScopes     | defaultScope |
       | pablodip | abc    | ["direct"]        | ["read", "write"] | read         |
 
   Scenario Outline: Invalid scope

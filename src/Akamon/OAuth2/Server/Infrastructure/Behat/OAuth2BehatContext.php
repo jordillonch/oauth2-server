@@ -41,24 +41,9 @@ class OAuth2BehatContext extends BehatContext
     /**
      * @Given /^I add the http basic authentication for the oauth2 client "([^"]*)" and "([^"]*)"$/
      */
-    public function iAddTheHttpBasicAuthenticationForTheOauthClientAnd($name, $secret)
+    public function iAddTheHttpBasicAuthenticationForTheOauthClientAnd($id, $secret)
     {
-        $client = $this->findClientByName($name);
-
-        $this->apiContext->addHttpBasicAuthentication(f\get($client, 'id'), $secret);
-    }
-
-    private function findClientByName($name)
-    {
-        $clients = $this->storage->getClientRepository()->findAll();
-
-        foreach ($clients as $client) {
-            if (f\get($client, 'name') === $name) {
-                return $client;
-            }
-        }
-
-        throw new \Exception(sprintf('The client "%s" does not exist.', $name));
+        $this->apiContext->addHttpBasicAuthentication($id, $secret);
     }
 
     /**

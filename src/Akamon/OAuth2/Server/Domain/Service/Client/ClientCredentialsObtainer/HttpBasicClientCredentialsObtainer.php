@@ -4,7 +4,6 @@ namespace Akamon\OAuth2\Server\Domain\Service\Client\ClientCredentialsObtainer;
 
 use Akamon\OAuth2\Server\Domain\Model\Client\ClientCredentials;
 use Akamon\OAuth2\Server\Domain\Exception\OAuthError\ClientCredentialsNotFoundOAuthErrorException;
-use Akamon\OAuth2\Server\Domain\Service\Client\ClientCredentialsObtainer\ClientCredentialsObtainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class HttpBasicClientCredentialsObtainer implements ClientCredentialsObtainerInterface

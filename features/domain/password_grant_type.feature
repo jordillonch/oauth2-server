@@ -2,7 +2,7 @@ Feature: OAuth Token Grant Password
 
   Background:
     Given there are oauth2 clients:
-      | name     | secret | allowedGrantTypes |
+      | id       | secret | allowedGrantTypes |
       | pablodip | abc    | ["password"]      |
     And there is a user "foo" with password "bar"
 

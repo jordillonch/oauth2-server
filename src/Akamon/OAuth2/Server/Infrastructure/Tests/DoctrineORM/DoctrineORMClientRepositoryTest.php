@@ -16,7 +16,7 @@ class DoctrineORMClientRepositoryTest extends ClientRepositoryTestCase
     protected function createRepository()
     {
         $dbParams = ['driver' => 'pdo_sqlite', 'memory' => true];
-        $config = Setup::createConfiguration();
+        $config = Setup::createConfiguration($devMode = true);
 
         $prefixes = [
             realpath(__DIR__ . '/../../../Infrastructure/DoctrineORM/ClientRepository') => 'Akamon\OAuth2\Server\Infrastructure\DoctrineORM\ClientRepository'

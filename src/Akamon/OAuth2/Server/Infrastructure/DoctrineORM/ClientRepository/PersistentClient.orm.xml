@@ -7,7 +7,7 @@
         <id name="id" type="integer">
             <generator strategy="AUTO" />
         </id>
-        <field name="name" type="string" length="255" />
+        <field name="oauth2Id" type="string" length="255" unique="true" />
         <field name="secret" type="string" length="255" nullable="true" />
         <field name="allowedGrantTypes" type="array" />
         <field name="allowedScopes" type="array" />

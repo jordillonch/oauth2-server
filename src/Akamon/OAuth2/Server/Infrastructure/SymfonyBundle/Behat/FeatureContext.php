@@ -10,12 +10,8 @@ use Akamon\Behat\ApiContext\Infrastructure\ClientRequester\SymfonyHttpKernelClie
 use Akamon\Behat\ApiContext\Infrastructure\RequestConverter\SymfonyHttpFoundationRequestConverter;
 use Akamon\Behat\ApiContext\Infrastructure\ResponseConverter\SymfonyHttpFoundationResponseConverter;
 use Akamon\OAuth2\Server\Domain\Model\Client\Client;
-use Behat\Behat\Context\ClosuredContextInterface,
-    Behat\Behat\Context\TranslatedContextInterface,
-    Behat\Behat\Context\BehatContext,
-    Behat\Behat\Exception\PendingException;
-use Behat\Gherkin\Node\PyStringNode,
-    Behat\Gherkin\Node\TableNode;
+use Behat\Behat\Context\BehatContext;
+use Behat\Gherkin\Node\TableNode;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Akamon\Behat\SymfonyKernelContext\SymfonyKernelBehatContext;
@@ -82,24 +78,9 @@ class FeatureContext extends BehatContext
     /**
      * @Given /^I add the http basic authentication for the oauth client "([^"]*)" and "([^"]*)"$/
      */
-    public function iAddTheHttpBasicAuthenticationForTheOauthClientAnd($name, $secret)
+    public function iAddTheHttpBasicAuthenticationForTheOauthClientAnd($id, $secret)
     {
-        $client = $this->findClientByName($name);
-
-        $this->apiContext->addHttpBasicAuthentication(f\get($client, 'id'), $secret);
-    }
-
-    private function findClientByName($name)
-    {
-        $clients = $this->getOAuthClientRepository()->findAll();
-
-        foreach ($clients as $client) {
-            if (f\get($client, 'name') === $name) {
-                return $client;
-            }
-        }
-
-        throw new \Exception(sprintf('The client "%s" does not exist.', $name));
+        $this->apiContext->addHttpBasicAuthentication($id, $secret);
     }
 
     private function getOAuthClientRepository()

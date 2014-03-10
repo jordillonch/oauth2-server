@@ -21,12 +21,12 @@ class DoctrineORMClientRepository implements ClientRepositoryInterface
      */
     public function add(Client $client)
     {
-        $persistedClient = new PersistentClient($client->getParams());
+        $persistedClient = new PersistentClient($this->filterParamsFromDomain($client->getParams()));
 
         $this->em->persist($persistedClient);
         $this->em->flush();
 
-        return new Client($persistedClient->getParams());
+        return new Client($this->filterParamsToDomain($persistedClient->getParams()));
     }
 
     /**
@@ -34,8 +34,8 @@ class DoctrineORMClientRepository implements ClientRepositoryInterface
      */
     public function update(Client $client)
     {
-        $persistedClient = $this->getRepository()->find(f\get($client, 'id'));
-        $persistedClient->setParams($client->getParams());
+        $persistedClient = $this->getRepository()->findOneBy(['oauth2Id' => f\get($client, 'id')]);
+        $persistedClient->setParams($this->filterParamsFromDomain($client->getParams()));
 
         $this->em->persist($persistedClient);
         $this->em->flush();
@@ -47,7 +47,7 @@ class DoctrineORMClientRepository implements ClientRepositoryInterface
     public function remove(Client $client)
     {
         $this->em
-            ->createQuery(sprintf('delete %s e where e.id = :id', $this->getEntityClass()))
+            ->createQuery(sprintf('delete %s e where e.oauth2Id = :id', $this->getEntityClass()))
             ->execute(['id' => f\get($client, 'id')]);
     }
 
@@ -56,9 +56,9 @@ class DoctrineORMClientRepository implements ClientRepositoryInterface
      */
     public function find($id)
     {
-        $persistedClient = $this->getRepository()->find($id);
+        $persistedClient = $this->getRepository()->findOneBy(['oauth2Id' => $id]);
 
-        return $persistedClient ? new Client($persistedClient->getParams()) : null;
+        return $persistedClient ? new Client($this->filterParamsToDomain($persistedClient->getParams())) : null;
     }
 
     /**
@@ -70,7 +70,7 @@ class DoctrineORMClientRepository implements ClientRepositoryInterface
 
         $clients = [];
         foreach ($persistedClients as $p) {
-            $clients[f\get($p->getParams(), 'id')] = new Client($p->getParams());
+            $clients[f\get($this->filterParamsToDomain($p->getParams()), 'id')] = new Client($this->filterParamsToDomain($p->getParams()));
         }
 
         return $clients;
@@ -84,5 +84,15 @@ class DoctrineORMClientRepository implements ClientRepositoryInterface
     private function getEntityClass()
     {
         return 'Akamon\OAuth2\Server\Infrastructure\DoctrineORM\ClientRepository\PersistentClient';
+    }
+
+    private function filterParamsFromDomain($params)
+    {
+        return f\assoc($params, 'oauth2Id', f\get($params, 'id'));
+    }
+
+    private function filterParamsToDomain($params)
+    {
+        return f\rename_key($params, 'oauth2Id', 'id');
     }
 }
